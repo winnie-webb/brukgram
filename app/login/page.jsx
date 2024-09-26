@@ -3,36 +3,55 @@
 import { useState } from "react";
 import { auth } from "../../firebase"; // Import the googleProvider
 import { signInWithEmailAndPassword } from "firebase/auth";
-
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import GoogleBtn from "../components/auth-utils/GoogleBtn";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const router = useRouter();
 
+  // Validation schema
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().required("Email is required").email("Email is invalid"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
   // Handle email/password login
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (data) => {
+    const { email, password } = data;
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/"); // Redirect to homepage after login
     } catch (err) {
-      setError(err.message);
+      if (err.code === "auth/wrong-password") {
+        setError("Invalid password.");
+      } else if (err.code === "auth/user-not-found") {
+        setError("User not found.");
+      } else {
+        setError("An error occurred. Please try again.");
+      }
     }
   };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white shadow-lg rounded-md">
-        <h2 className="text-2xl font-bold text-gray-900 text-center">Login</h2>
+      <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-md">
         {error && <p className="text-red-500 text-center">{error}</p>}
 
         {/* Email/Password Login Form */}
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleSubmit(handleLogin)} className="space-y-6">
           <div>
             <label
               htmlFor="email"
@@ -43,10 +62,14 @@ const LoginPage = () => {
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              {...register("email")} // Register input for validation
+              className={`block w-full px-3 py-2 bg-gray-50 border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
           <div>
             <label
@@ -58,10 +81,14 @@ const LoginPage = () => {
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              {...register("password")} // Register input for validation
+              className={`block w-full px-3 py-2 bg-gray-50 border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
           </div>
           <button
             type="submit"
@@ -73,7 +100,7 @@ const LoginPage = () => {
         <GoogleBtn setError={setError} />
 
         <p className="text-center text-gray-600">
-          Don't have an account?{" "}
+          {"Don't have an account?"}{" "}
           <Link
             href="/signup"
             className="text-indigo-600 hover:text-indigo-500"
