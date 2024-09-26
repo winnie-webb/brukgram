@@ -1,11 +1,13 @@
 "use client"; // Client-side component
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { auth } from "../../firebase"; // Import the googleProvider
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import GoogleBtn from "../components/auth-utils/GoogleBtn";
+import { useAuth } from "../context/AuthContext"; // Use Auth context
+
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -13,7 +15,12 @@ import * as Yup from "yup";
 const LoginPage = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
-
+  const { user, loading } = useAuth(); // Access user and loading from context
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/"); // Redirect if logged in
+    }
+  }, [user, loading, router]);
   // Validation schema
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),

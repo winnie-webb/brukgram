@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { auth } from "../../firebase"; // Import the googleProvider
+import { useAuth } from "../context/AuthContext"; // Use Auth context
+
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -13,6 +15,14 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordChecker, setPasswordChecker] = useState("");
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/"); // Redirect if logged in
+    }
+  }, [user, loading, router]);
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
     password: Yup.string()
@@ -43,7 +53,6 @@ const Signup = () => {
     resolver: yupResolver(validationSchema),
   });
   const [error, setError] = useState(null);
-  const router = useRouter();
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50">
