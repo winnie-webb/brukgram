@@ -20,10 +20,7 @@ const PostCard = ({ post }) => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            controls
-          >
+          <video className="w-full h-full object-cover" controls>
             <source src={mediaUrl} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
