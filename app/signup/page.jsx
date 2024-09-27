@@ -10,19 +10,20 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import GoogleBtn from "../components/auth-utils/GoogleBtn";
+import { registerUser } from "../components/auth-utils/registerUser";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordChecker, setPasswordChecker] = useState("");
-  const { user, loading } = useAuth();
+  const { currentUser, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && currentUser) {
       router.push("/"); // Redirect if logged in
     }
-  }, [user, loading, router]);
+  }, [currentUser, loading, router]);
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
     password: Yup.string()
@@ -33,15 +34,20 @@ const Signup = () => {
       .oneOf([Yup.ref("password")], "Passwords don't match"), // Check if passwords match
   });
   const onSubmit = async () => {
-    // e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user; // Create a corresponding document in Firestore
+      registerUser(user);
       router.push("/login");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("This email is already in use.");
       } else {
-        setError("An error occurred. Please try again.");
+        setError(`Please ensure your credentials are correct. ${err.message}`);
       }
     }
   };
