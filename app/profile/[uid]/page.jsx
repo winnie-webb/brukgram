@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { auth } from "../../../firebase"; // Firebase auth instance
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase"; // Firestore instance
+import Link from "next/link";
 
 const ProfilePage = ({ params }) => {
   const uid = params.uid;
@@ -57,6 +58,9 @@ const ProfilePage = ({ params }) => {
       {/* Render additional options based on profile view */}
       {isOwnProfile ? (
         <div>
+          <Link href={"/posts"}>
+            <button>Create Post</button>
+          </Link>
           <button>Edit Profile</button>
           {/* Render other personal options like changing password */}
         </div>

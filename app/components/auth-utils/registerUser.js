@@ -6,7 +6,7 @@ export async function registerUser(user) {
   try {
     await setDoc(doc(db, "users", user.uid), {
       email: user.email,
-      username: "newuser",
+      username: "",
       bio: "", // Initialize with an empty bio or any default value
       profilePictureUrl: "", // Placeholder for profile picture URL
       createdAt: now.toISOString(),
@@ -14,7 +14,6 @@ export async function registerUser(user) {
       followers: [],
       following: [],
       postsCount: 0,
-      likesCount: 0,
     });
   } catch (e) {
     console.log(e);
