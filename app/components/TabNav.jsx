@@ -3,11 +3,16 @@ import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   AiOutlineHome,
+  AiFillHome,
   AiOutlineSearch,
+  AiFillSearch,
   AiOutlinePlusCircle,
+  AiFillPlusCircle,
   AiOutlineHeart,
+  AiFillHeart,
   AiOutlineUser,
-} from "react-icons/ai"; // Import icons from react-icons
+  AiFillUser,
+} from "react-icons/ai"; // Import both outline and filled icons from react-icons
 
 const TabNav = () => {
   const router = useRouter();
@@ -31,7 +36,11 @@ const TabNav = () => {
             isActive("/") ? "text-black font-bold" : "text-gray-500"
           }`}
         >
-          <AiOutlineHome className="text-2xl" />
+          {isActive("/") ? (
+            <AiFillHome className="text-2xl" />
+          ) : (
+            <AiOutlineHome className="text-2xl" />
+          )}
           <span className="ml-2">Home</span>
         </button>
 
@@ -42,7 +51,11 @@ const TabNav = () => {
             isActive("/search") ? "text-black font-bold" : "text-gray-500"
           }`}
         >
-          <AiOutlineSearch className="text-2xl" />
+          {isActive("/search") ? (
+            <AiFillSearch className="text-2xl" />
+          ) : (
+            <AiOutlineSearch className="text-2xl" />
+          )}
           <span className="ml-2">Search</span>
         </button>
 
@@ -53,7 +66,11 @@ const TabNav = () => {
             isActive("/posts") ? "text-black font-bold" : "text-gray-500"
           }`}
         >
-          <AiOutlinePlusCircle className="text-2xl" />
+          {isActive("/posts") ? (
+            <AiFillPlusCircle className="text-2xl" />
+          ) : (
+            <AiOutlinePlusCircle className="text-2xl" />
+          )}
           <span className="ml-2">Posts</span>
         </button>
 
@@ -66,7 +83,11 @@ const TabNav = () => {
               : "text-gray-500"
           }`}
         >
-          <AiOutlineHeart className="text-2xl" />
+          {isActive("/notifications") ? (
+            <AiFillHeart className="text-2xl" />
+          ) : (
+            <AiOutlineHeart className="text-2xl" />
+          )}
           <span className="ml-2">Notifications</span>
         </button>
 
@@ -77,7 +98,11 @@ const TabNav = () => {
             isActive("/profile") ? "text-black font-bold" : "text-gray-500"
           }`}
         >
-          <AiOutlineUser className="text-2xl" />
+          {isActive("/profile") ? (
+            <AiFillUser className="text-2xl" />
+          ) : (
+            <AiOutlineUser className="text-2xl" />
+          )}
           <span className="ml-2">Profile</span>
         </button>
       </div>
@@ -92,7 +117,11 @@ const TabNav = () => {
               isActive("/") ? "text-black font-bold" : "text-gray-500"
             }`}
           >
-            <AiOutlineHome className="text-2xl" />
+            {isActive("/") ? (
+              <AiFillHome className="text-2xl" />
+            ) : (
+              <AiOutlineHome className="text-2xl" />
+            )}
           </button>
 
           <button
@@ -102,7 +131,11 @@ const TabNav = () => {
               isActive("/search") ? "text-black font-bold" : "text-gray-500"
             }`}
           >
-            <AiOutlineSearch className="text-2xl" />
+            {isActive("/search") ? (
+              <AiFillSearch className="text-2xl" />
+            ) : (
+              <AiOutlineSearch className="text-2xl" />
+            )}
           </button>
 
           <button
@@ -112,7 +145,11 @@ const TabNav = () => {
               isActive("/posts") ? "text-black font-bold" : "text-gray-500"
             }`}
           >
-            <AiOutlinePlusCircle className="text-2xl" />
+            {isActive("/posts") ? (
+              <AiFillPlusCircle className="text-2xl" />
+            ) : (
+              <AiOutlinePlusCircle className="text-2xl" />
+            )}
           </button>
 
           <button
@@ -124,7 +161,11 @@ const TabNav = () => {
                 : "text-gray-500"
             }`}
           >
-            <AiOutlineHeart className="text-2xl" />
+            {isActive("/notifications") ? (
+              <AiFillHeart className="text-2xl" />
+            ) : (
+              <AiOutlineHeart className="text-2xl" />
+            )}
           </button>
 
           <button
@@ -134,7 +175,11 @@ const TabNav = () => {
               isActive("/profile") ? "text-black font-bold" : "text-gray-500"
             }`}
           >
-            <AiOutlineUser className="text-2xl" />
+            {isActive("/profile") ? (
+              <AiFillUser className="text-2xl" />
+            ) : (
+              <AiOutlineUser className="text-2xl" />
+            )}
           </button>
         </div>
       </div>
