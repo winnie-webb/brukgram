@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import TabNav from "./components/TabNav";
 
 export const metadata = {
   title: "Brukgram",
@@ -10,7 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          <TabNav></TabNav>
+        </AuthProvider>
       </body>
     </html>
   );
