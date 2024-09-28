@@ -1,29 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "../../firebase"; // Import the googleProvider
-import { useAuth } from "../context/AuthContext"; // Use Auth context
-
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../firebase";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import GoogleBtn from "../components/auth-utils/GoogleBtn";
-import { registerUser } from "../components/auth-utils/registerUser";
+import { registerUser } from "../components/auth-utils/registerUser"; // (Optional)
+import { useAuth } from "../context/AuthContext";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [passwordChecker, setPasswordChecker] = useState("");
   const { currentUser, loading } = useAuth();
   const router = useRouter();
+
+  // Check for existing display name on form submission (consider using a custom hook for reusability)
+  const checkDisplayNameExists = async (displayName) => {
+    const displayNameRef = collection(db, "users");
+    const querySnapshot = await getDocs(displayNameRef);
+    const existingNames = querySnapshot.docs.map(
+      (doc) => doc.data().displayName
+    );
+    return existingNames.includes(displayName);
+  };
 
   useEffect(() => {
     if (!loading && currentUser) {
       router.push("/"); // Redirect if logged in
     }
   }, [currentUser, loading, router]);
+
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
     password: Yup.string()
@@ -31,17 +43,34 @@ const Signup = () => {
       .min(6, "Password must be at least 6 characters"),
     confirmPassword: Yup.string()
       .required("Please confirm your password")
-      .oneOf([Yup.ref("password")], "Passwords don't match"), // Check if passwords match
+      .oneOf([Yup.ref("password")], "Passwords don't match"),
+    displayName: Yup.string().required("Display name is required"),
   });
-  const onSubmit = async () => {
+
+  const onSubmit = async (data) => {
+    const { email, password, displayName } = data;
     try {
+      const existing = await checkDisplayNameExists(displayName);
+      if (existing) {
+        setError("This display name is already in use.");
+        return;
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      const user = userCredential.user; // Create a corresponding document in Firestore
-      registerUser(user);
+      const user = userCredential.user;
+
+      // Create a corresponding document in db
+      await addDoc(collection(db, "users"), {
+        uid: user.uid,
+        email,
+        displayName,
+      });
+
+      registerUser(user); // (Optional) Call registerUser if needed
       router.push("/login");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
@@ -51,6 +80,7 @@ const Signup = () => {
       }
     }
   };
+
   const {
     register,
     handleSubmit,
@@ -65,6 +95,25 @@ const Signup = () => {
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-md">
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <label
+              htmlFor="displayName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Display Name
+            </label>
+            <input
+              type="text"
+              id="displayName"
+              value={displayName}
+              {...register("displayName")}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {errors.displayName && (
+              <p className="text-red-500">{errors.displayName.message}</p>
+            )}
+          </div>
           <div>
             <label
               htmlFor="email"
