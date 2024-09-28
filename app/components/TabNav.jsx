@@ -116,7 +116,7 @@ const TabNav = () => {
 
         {/* Bottom navigation for smaller screens */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden">
-          <div className="fixed top-0 left-0 border-b-2 bg-white z-20 w-full flex justify-between items-center px-4 py-2">
+          <div className="fixed top-0 left-0 border-b-2 bg-white z-20 w-full flex justify-between items-center px-4 py-1">
             <Image
               src={logo}
               width={100}
