@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import PostCard from "./components/PostCard"; // Assuming this component exists
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 
 const HomePage = () => {
@@ -9,13 +9,16 @@ const HomePage = () => {
 
   useEffect(() => {
     const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const postsData = snapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data(),
+        ...doc.data(), // Extract all fields from Firestore document
       }));
+      console.log(postsData);
       setPosts(postsData);
     });
+
     return () => unsubscribe();
   }, []);
 
