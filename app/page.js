@@ -24,7 +24,7 @@ const HomePage = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-8 md:px-5">
-      <div>
+      <div className="md:ml-[20%] ">
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
