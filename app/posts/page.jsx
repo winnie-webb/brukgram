@@ -48,6 +48,7 @@ export default function CreatePost() {
         content,
         mediaUrl, // Store the media URL (empty string if no file)
         authorId: user.uid,
+        postId: uuidv4(),
         timestamp: serverTimestamp(),
         mediaType: checkMediaType(media),
       });
