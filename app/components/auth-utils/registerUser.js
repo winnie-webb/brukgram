@@ -68,6 +68,7 @@ const googleSignIn = async () => {
     if (!userDoc.exists()) {
       await setDoc(userDocRef, {
         email: user.email,
+        id: user.uid,
         displayName: displayName,
         bio: "",
         profilePictureUrl: "",
