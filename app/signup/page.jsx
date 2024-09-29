@@ -8,9 +8,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import GoogleBtn from "../components/auth-utils/GoogleBtn";
-import { registerUser } from "../components/auth-utils/registerUser"; // (Optional)
+import { registerUser } from "../components/auth-utils/registerUser";
 import { useAuth } from "../context/AuthContext";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -18,9 +17,10 @@ const Signup = () => {
   const [displayName, setDisplayName] = useState("");
   const [passwordChecker, setPasswordChecker] = useState("");
   const { currentUser, loading } = useAuth();
+  const [error, setError] = useState(null);
+
   const router = useRouter();
 
-  // Check for existing display name on form submission (consider using a custom hook for reusability)
   const checkDisplayNameExists = async (displayName) => {
     const displayNameRef = collection(db, "users");
     const querySnapshot = await getDocs(displayNameRef);
@@ -55,23 +55,7 @@ const Signup = () => {
         setError("This display name is already in use.");
         return;
       }
-
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      // Create a corresponding document in db
-      await addDoc(collection(db, "users"), {
-        uid: user.uid,
-        email,
-        displayName,
-      });
-
-      registerUser(user); // (Optional) Call registerUser if needed
-      router.push("/login");
+      registerUser(email, password, displayName, setError, router);
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("This email is already in use.");
@@ -88,7 +72,6 @@ const Signup = () => {
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
-  const [error, setError] = useState(null);
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50">

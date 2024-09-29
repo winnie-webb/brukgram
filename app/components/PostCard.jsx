@@ -53,6 +53,7 @@ const PostCard = ({ post }) => {
         const postUserSnap = await getDoc(postRef);
         if (postUserSnap.exists()) {
           setPostUser(postUserSnap.data());
+          console.log(postUserSnap.data());
         }
       }
     };
@@ -91,7 +92,7 @@ const PostCard = ({ post }) => {
             <h3 className="font-semibold">{postUser.userName}</h3>
           </>
         ) : (
-          <p>Loading...</p>
+          <p>{"Anonymous"}</p>
         )}
       </div>
 

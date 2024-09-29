@@ -1,15 +1,15 @@
 // "use client";
 import React from "react";
-import { auth, googleProvider } from "../../../firebase"; // Import the googleProvider
 import { useRouter } from "next/navigation";
-import { signInWithPopup } from "firebase/auth";
+import { googleSignIn } from "./registerUser";
 
 const GoogleBtn = ({ setError }) => {
   const router = useRouter();
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      await googleSignIn();
+
       router.push("/"); // Redirect to homepage after Google login
     } catch (err) {
       setError(err.message);
