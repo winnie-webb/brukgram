@@ -25,6 +25,7 @@ const registerUser = async (email, password, displayName, setError, router) => {
       // Save additional user info to Firestore
       await setDoc(userDocRef, {
         email: user.email,
+        id: user.uid,
         displayName: displayName,
         bio: "", // Initialize with an empty bio or any default value
         profilePictureUrl: "", // Placeholder for profile picture URL
