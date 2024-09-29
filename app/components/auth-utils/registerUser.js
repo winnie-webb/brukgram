@@ -6,26 +6,28 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-// Function to register or sign in the user
+
 const registerUser = async (email, password, displayName, setError, router) => {
   try {
-    // Check if user already exists in Firestore
-    const userDocRef = doc(db, "users", email);
+    // Register the user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
+    const now = Date.now();
+
+    // Create a Firestore document with user.uid as the document ID
+    const userDocRef = doc(db, "users", user.uid); // Use user.uid instead of email
+
+    // Check if the user already exists in Firestore
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
-      // If user does not exist, create a new user
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      const now = Date.now();
       // Save additional user info to Firestore
       await setDoc(userDocRef, {
         email: user.email,
-        id: user.uid,
         displayName: displayName,
         bio: "", // Initialize with an empty bio or any default value
         profilePictureUrl: "", // Placeholder for profile picture URL
@@ -35,17 +37,11 @@ const registerUser = async (email, password, displayName, setError, router) => {
         following: [],
         postsCount: 0,
       });
-      router.push("/login");
-
-      return user; // Return the user object
-    } else {
-      // If user exists, simply sign them in
-      const userCredential = await signInWithEmailAndPassword(email, password);
-      router.push("/login");
-
-      return userCredential.user;
     }
-  } catch (error) {
+
+    router.push("/login");
+    return user; // Return the user object
+  } catch (err) {
     if (err.code === "auth/email-already-in-use") {
       setError("This email is already in use.");
     } else {
@@ -60,20 +56,20 @@ const googleSignIn = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    const now = new Date().toISOString();
 
-    // Check if user already exists in Firestore
-    const userDocRef = doc(db, "users", user.uid);
+    // Check if the user already exists in Firestore
+    const userDocRef = doc(db, "users", user.uid); // Use user.uid
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
       await setDoc(userDocRef, {
         email: user.email,
-        id: user.uid,
-        displayName: displayName,
+        displayName: user.displayName,
         bio: "",
         profilePictureUrl: "",
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
+        createdAt: now,
+        updatedAt: now,
         followers: [],
         following: [],
         postsCount: 0,
