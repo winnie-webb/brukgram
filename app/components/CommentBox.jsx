@@ -18,7 +18,10 @@ export const CommentBox = ({ postId, user }) => {
     const commentsRef = collection(db, "posts", postId, "comments");
 
     const unsubscribeComments = onSnapshot(commentsRef, (snapshot) => {
-      const commentsData = snapshot.docs.map((doc) => doc.data());
+      const commentsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setComments(commentsData);
     });
 
@@ -33,18 +36,20 @@ export const CommentBox = ({ postId, user }) => {
       const newUserNames = { ...userNames }; // Copy current state
 
       const userFetchPromises = comments.map(async (comment) => {
-        if (!newUserNames[comment.userId]) {
-          const userRef = doc(db, "users", comment.userId);
+        const { userId } = comment;
+        // Only fetch if userId is not in the current userNames state
+        if (!newUserNames[userId]) {
+          const userRef = doc(db, "users", userId);
           const userSnap = await getDoc(userRef);
+          // console.log(userSnap.data());
           if (userSnap.exists()) {
-            newUserNames[comment.userId] = userSnap.data().displayName;
+            newUserNames[userId] = userSnap.data().displayName;
           } else {
-            newUserNames[comment.userId] = "Unknown"; // Fallback if no user data
+            newUserNames[userId] = "Unknown"; // Fallback if no user data
           }
         }
       });
 
-      // Await all username fetches before setting state
       await Promise.all(userFetchPromises);
       setUserNames(newUserNames); // Update state after all usernames are fetched
     };
@@ -52,7 +57,7 @@ export const CommentBox = ({ postId, user }) => {
     if (comments.length > 0) {
       fetchUserNames();
     }
-  }, [comments, userNames]); // Re-run only when comments change
+  }, [comments]); // Re-run only when comments change
 
   // Handle Comment Submission
   const handleCommentSubmit = async (e) => {
