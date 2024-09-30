@@ -47,11 +47,10 @@ const ProfilePage = ({ params }) => {
   }, [uid, currentUserId]);
 
   if (!userData) return <div>Loading...</div>;
-  console.log(userData);
   const isOwnProfile = currentUserId === uid; // Check if viewing own profile
 
   return (
-    <div className="profile-container">
+    <div className="ml-[20%]">
       <h1>{userData.email}</h1>
       <p>{userData.bio}</p>
 
