@@ -139,7 +139,13 @@ const PostCard = ({ post }) => {
       </span>
 
       {/* Comment Section */}
-      {showCommentBox && <CommentBox user={user} postId={id}></CommentBox>}
+      {showCommentBox && (
+        <CommentBox
+          post={post} // Pass the entire post
+          user={user}
+          onClose={() => setShowCommentBox(false)}
+        />
+      )}
     </div>
   );
 };

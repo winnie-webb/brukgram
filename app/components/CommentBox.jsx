@@ -7,15 +7,21 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
+import Image from "next/image";
+import defaultUser from "../public/default-user.jpg"; // Default user image
 
-export const CommentBox = ({ postId, user }) => {
+export const CommentBox = ({ post, user, onClose }) => {
+  const { id, mediaUrl, mediaType, content, authorId } = post;
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
   const [userNames, setUserNames] = useState({}); // To store userId -> displayName mapping
+  const [userPhotos, setUserPhotos] = useState({}); // Store user profile photos
+  const modalRef = useRef(null);
 
   useEffect(() => {
-    const commentsRef = collection(db, "posts", postId, "comments");
+    const commentsRef = collection(db, "posts", id, "comments");
 
     const unsubscribeComments = onSnapshot(commentsRef, (snapshot) => {
       const commentsData = snapshot.docs.map((doc) => ({
@@ -28,43 +34,46 @@ export const CommentBox = ({ postId, user }) => {
     return () => {
       unsubscribeComments();
     };
-  }, [postId]);
+  }, [id]);
 
-  // Fetch the username for each comment
+  // Fetch the username and photo for each comment
   useEffect(() => {
     const fetchUserNames = async () => {
       const newUserNames = { ...userNames }; // Copy current state
+      const newUserPhotos = { ...userPhotos }; // Copy current photo state
 
       const userFetchPromises = comments.map(async (comment) => {
         const { userId } = comment;
-        // Only fetch if userId is not in the current userNames state
         if (!newUserNames[userId]) {
           const userRef = doc(db, "users", userId);
           const userSnap = await getDoc(userRef);
-          // console.log(userSnap.data());
           if (userSnap.exists()) {
-            newUserNames[userId] = userSnap.data().displayName;
+            const userData = userSnap.data();
+            newUserNames[userId] = userData.displayName;
+            newUserPhotos[userId] = userData.profilePictureUrl || defaultUser;
           } else {
-            newUserNames[userId] = "Unknown"; // Fallback if no user data
+            newUserNames[userId] = "Unknown";
+            newUserPhotos[userId] = defaultUser;
           }
         }
       });
 
       await Promise.all(userFetchPromises);
-      setUserNames(newUserNames); // Update state after all usernames are fetched
+      setUserNames(newUserNames);
+      setUserPhotos(newUserPhotos);
     };
 
     if (comments.length > 0) {
       fetchUserNames();
     }
-  }, [comments]); // Re-run only when comments change
+  }, [comments]);
 
   // Handle Comment Submission
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim()) return;
 
-    const commentRef = collection(db, "posts", postId, "comments");
+    const commentRef = collection(db, "posts", id, "comments");
     await setDoc(doc(commentRef), {
       userId: user.uid,
       comment: comment.trim(),
@@ -75,32 +84,157 @@ export const CommentBox = ({ postId, user }) => {
   };
 
   return (
-    <div className="mt-4">
-      <form onSubmit={handleCommentSubmit}>
-        <input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Add a comment..."
-          className="w-full p-2 border rounded-md"
-        />
+    <div
+      onClick={(e) => {
+        onClose();
+      }}
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+    >
+      <div
+        ref={modalRef}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white w-full h-full md:max-h-90vh md:h-[90%] md:max-w-[60%] md:flex md:flex-row rounded-lg relative"
+      >
+        {/* Close Icon */}
         <button
-          type="submit"
-          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10"
         >
-          Post
+          <AiOutlineClose className="w-6 h-6" />
         </button>
-      </form>
 
-      <div className="mt-4">
-        {comments.map((comment, index) => (
-          <div key={index} className="mb-2">
-            <p className="font-semibold">
-              {userNames[comment.userId] || "Loading..."}
-            </p>
-            <p>{comment.comment}</p>
+        {/* Post Section for larger screens */}
+        <div className="hidden md:flex md:w-3/5 p-4">
+          {/* Media */}
+          <div className="relative w-full h-64 md:h-full">
+            {mediaType === "image" ? (
+              <Image
+                src={mediaUrl}
+                alt={content}
+                layout="responsive"
+                width={16}
+                height={9}
+                className="object-cover"
+              />
+            ) : mediaType === "video" ? (
+              <video
+                controls
+                src={mediaUrl}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <p>{content}</p>
+            )}
           </div>
-        ))}
+
+          {/* Content */}
+          <p className="mt-4 text-gray-700">{content}</p>
+        </div>
+
+        {/* Comment Section for all screens */}
+        <div className="w-full md:w-2/5 p-4 border-l md:overflow-y-auto">
+          <form
+            onSubmit={handleCommentSubmit}
+            className="flex space-x-2 items-center"
+          >
+            <input
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="w-full p-2 border rounded-md"
+            />
+            <button
+              type="submit"
+              className="p-2 bg-indigo-600 text-white rounded-md flex items-center justify-center"
+            >
+              <AiOutlineSend className="w-5 h-5" />
+            </button>
+          </form>
+
+          {/* Comments list */}
+          <div className="mt-4 space-y-4">
+            {comments.length > 0 ? (
+              comments.map((comment, index) => (
+                <div key={index} className="flex space-x-2 items-start">
+                  <Image
+                    className="rounded-full"
+                    src={userPhotos[comment.userId] || defaultUser}
+                    alt="Profile"
+                    width={30}
+                    height={30}
+                  />
+                  <div>
+                    <p className="font-semibold">
+                      {userNames[comment.userId] || "Loading..."}
+                    </p>
+                    <p>{comment.comment}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500">No comments yet.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* For smaller screens, show only the comments section */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 md:hidden bg-white z-50 flex flex-col"
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10"
+        >
+          <AiOutlineClose className="w-6 h-6" />
+        </button>
+
+        {/* Comments list */}
+        <div className="flex-grow p-4 overflow-y-auto">
+          {comments.length > 0 ? (
+            comments.map((comment, index) => (
+              <div key={index} className="flex space-x-2 items-start">
+                <Image
+                  className="rounded-full"
+                  src={userPhotos[comment.userId] || defaultUser}
+                  alt="Profile"
+                  width={30}
+                  height={30}
+                />
+                <div>
+                  <p className="font-semibold">
+                    {userNames[comment.userId] || "Loading..."}
+                  </p>
+                  <p>{comment.comment}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No comments yet.</p>
+          )}
+        </div>
+
+        {/* Comment input section */}
+        <form
+          onSubmit={handleCommentSubmit}
+          className="flex space-x-2 items-center p-4 border-t"
+        >
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="w-full p-2 border rounded-md"
+          />
+          <button
+            type="submit"
+            className="p-2 bg-indigo-600 text-white rounded-md flex items-center justify-center"
+          >
+            <AiOutlineSend className="w-5 h-5" />
+          </button>
+        </form>
       </div>
     </div>
   );
