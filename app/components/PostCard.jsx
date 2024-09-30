@@ -82,12 +82,12 @@ const PostCard = ({ post }) => {
           <>
             <Image
               className="rounded-full w-12 h-12"
-              src={postUser.profilePictureUrl || defaultUser} // Assuming the post user has a profile picture
+              src={postUser.profilePictureUrl || defaultUser}
               alt="Profile"
               width={50}
               height={50}
             />
-            <h3 className="font-semibold">{postUser.userName}</h3>
+            <h3 className="font-semibold">{postUser.displayName}</h3>
           </>
         ) : (
           <p>{"Anonymous"}</p>
