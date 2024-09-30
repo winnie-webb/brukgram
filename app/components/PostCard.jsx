@@ -96,7 +96,7 @@ const PostCard = ({ post }) => {
         )}
       </div>
 
-      <div className="relative h-60 aspect-w-16 aspect-h-9 w-full mb-4">
+      <div className="relative h-60 aspect-w-16 aspect-h-9 w-full mb-1">
         {mediaType === "image" ? (
           <Image
             className="object-cover"
@@ -111,9 +111,9 @@ const PostCard = ({ post }) => {
         )}
       </div>
 
-      <p className="text-gray-700 mb-4">{content}</p>
+      <p className="">{content}</p>
 
-      <div className="flex gap-x-2 mt-4 items-center">
+      <div className="flex gap-x-2 mt-2 items-center">
         <button onClick={handleLike} className="flex items-center">
           {hasLiked ? (
             <AiFillHeart className="w-6 h-6 text-red-500" />
