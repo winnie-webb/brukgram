@@ -94,28 +94,18 @@ export const CommentBox = ({ post, user, onClose }) => {
       <div
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white w-full h-full md:max-h-90vh md:h-[90%] md:max-w-[60%] md:flex md:flex-row rounded-lg relative"
+        className="bg-white w-full h-full md:h-[80%] md:max-w-[60%] md:flex md:flex-row rounded-lg relative"
       >
-        {/* Close Icon */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10"
-        >
-          <AiOutlineClose className="w-6 h-6" />
-        </button>
-
         {/* Post Section for larger screens */}
-        <div className="hidden md:flex md:w-3/5 p-4">
+        <div className="hidden md:flex md:w-3/5">
           {/* Media */}
           <div className="relative w-full h-64 md:h-full">
             {mediaType === "image" ? (
               <Image
                 src={mediaUrl}
                 alt={content}
-                layout="responsive"
-                width={16}
-                height={9}
-                className="object-cover"
+                fill={true}
+                className="object-fill"
               />
             ) : mediaType === "video" ? (
               <VideoPlayer mediaUrl={mediaUrl} />
@@ -189,7 +179,7 @@ export const CommentBox = ({ post, user, onClose }) => {
         <div className="flex-grow p-4 overflow-y-auto">
           {comments.length > 0 ? (
             comments.map((comment, index) => (
-              <div key={index} className="flex space-x-2 items-start">
+              <div key={index} className="flex space-x-2 mb-2 items-start">
                 <Image
                   className="rounded-full"
                   src={userPhotos[comment.userId] || defaultUser}
