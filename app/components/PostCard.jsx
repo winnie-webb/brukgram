@@ -15,8 +15,8 @@ import { useAuth } from "../context/AuthContext";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { CommentBox } from "./CommentBox";
 import defaultUser from "../public/default-user.jpg";
-import { IoShareOutline } from "react-icons/io5";
 import { FiMessageCircle, FiSend } from "react-icons/fi";
+import Link from "next/link";
 
 const PostCard = ({ post }) => {
   const { id, mediaUrl, mediaType, content, authorId } = post;
@@ -87,7 +87,9 @@ const PostCard = ({ post }) => {
               width={50}
               height={50}
             />
-            <h3 className="font-semibold">{postUser.displayName}</h3>
+            <Link href={`/profile/${user.uid}`} className="font-semibold">
+              {postUser.displayName}
+            </Link>
           </>
         ) : (
           <p>{"Anonymous"}</p>
