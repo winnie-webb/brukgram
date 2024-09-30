@@ -12,14 +12,12 @@ import {
 import { db } from "../../firebase";
 import VideoPlayer from "./VideoPlayer"; // Assuming you have a VideoPlayer component
 import { useAuth } from "../context/AuthContext";
-import {
-  AiOutlineHeart,
-  AiFillHeart,
-  AiOutlineComment,
-  AiOutlineShareAlt,
-} from "react-icons/ai";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { CommentBox } from "./CommentBox";
 import defaultUser from "../public/default-user.jpg";
+import { IoShareOutline } from "react-icons/io5";
+import { FiMessageCircle, FiSend } from "react-icons/fi";
+
 const PostCard = ({ post }) => {
   const { id, mediaUrl, mediaType, content, authorId } = post;
   const { user } = useAuth();
@@ -114,24 +112,23 @@ const PostCard = ({ post }) => {
       <p className="text-gray-700 mb-4">{content}</p>
 
       <div className="flex gap-x-2 mt-4 items-center">
-        <button onClick={handleLike} className="flex items-center space-x-1">
+        <button onClick={handleLike} className="flex items-center">
           {hasLiked ? (
             <AiFillHeart className="w-6 h-6 text-red-500" />
           ) : (
-            <AiOutlineHeart className="w-6 h-6 text-gray-500" />
+            <AiOutlineHeart className="w-6 h-6" />
           )}
         </button>
 
         <button
           onClick={() => setShowCommentBox(!showCommentBox)}
-          className="flex items-center space-x-1"
+          className="flex items-center"
         >
-          <AiOutlineComment className="w-6 h-6 text-gray-500" />
-          <span className="ml-1 font-bold text-gray-600"></span>
+          <FiMessageCircle className="w-6 h-6" />
         </button>
 
-        <button className="flex items-center space-x-1">
-          <AiOutlineShareAlt className="w-6 h-6 text-gray-500" />
+        <button className="flex items-center">
+          <FiSend className="w-6 h-6" />
         </button>
       </div>
       <span className="mt-2 ml-1 block font-bold text-gray-600">
