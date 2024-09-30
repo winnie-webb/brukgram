@@ -24,7 +24,6 @@ const PostCard = ({ post }) => {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
-
   const [postUser, setPostUser] = useState(null);
 
   // Fetch likes and comments on mount and listen to changes
@@ -51,7 +50,6 @@ const PostCard = ({ post }) => {
         const postUserSnap = await getDoc(postRef);
         if (postUserSnap.exists()) {
           setPostUser(postUserSnap.data());
-          console.log(postUserSnap.data());
         }
       }
     };
@@ -76,8 +74,8 @@ const PostCard = ({ post }) => {
   };
 
   return (
-    <div className="relative bg-white mb-6 p-4 rounded-lg">
-      <div className="flex items-center">
+    <div className="relative bg-white mb-6">
+      <div className="flex items-center mb-2">
         {postUser ? (
           <>
             <Image
@@ -87,64 +85,64 @@ const PostCard = ({ post }) => {
               width={50}
               height={50}
             />
-            <Link href={`/profile/${user.uid}`} className="font-semibold">
+            <Link
+              href={`/profile/${postUser.uid}`}
+              className="font-semibold ml-2"
+            >
               {postUser.displayName}
             </Link>
           </>
         ) : (
-          <p>{"Anonymous"}</p>
+          <p className="font-semibold">Anonymous</p>
         )}
       </div>
 
-      <div className="relative h-60 aspect-w-16 aspect-h-9 w-full mb-1">
+      <div className="relative w-full mb-1 aspect-w-16 aspect-h-16">
         {mediaType === "image" ? (
-          <Image
-            className="object-cover"
-            src={mediaUrl}
-            alt={content}
-            fill={true}
-          />
+          <Image className="object-cover" src={mediaUrl} alt={content} fill />
         ) : mediaType === "video" ? (
           <VideoPlayer videoSrc={mediaUrl} />
         ) : (
-          <p>{content}</p>
+          <p className="p-4">{content}</p>
         )}
       </div>
 
-      <p className="">{content}</p>
+      <div className="px-2 md:px-0">
+        <p className="text-gray-800">{content}</p>
 
-      <div className="flex gap-x-2 mt-2 items-center">
-        <button onClick={handleLike} className="flex items-center">
-          {hasLiked ? (
-            <AiFillHeart className="w-6 h-6 text-red-500" />
-          ) : (
-            <AiOutlineHeart className="w-6 h-6" />
-          )}
-        </button>
+        <div className="flex gap-x-2 mt-2 items-center">
+          <button onClick={handleLike} className="flex items-center">
+            {hasLiked ? (
+              <AiFillHeart className="w-6 h-6 text-red-500" />
+            ) : (
+              <AiOutlineHeart className="w-6 h-6" />
+            )}
+          </button>
 
-        <button
-          onClick={() => setShowCommentBox(!showCommentBox)}
-          className="flex items-center"
-        >
-          <FiMessageCircle className="w-6 h-6" />
-        </button>
+          <button
+            onClick={() => setShowCommentBox(!showCommentBox)}
+            className="flex items-center"
+          >
+            <FiMessageCircle className="w-6 h-6" />
+          </button>
 
-        <button className="flex items-center">
-          <FiSend className="w-6 h-6" />
-        </button>
+          <button className="flex items-center">
+            <FiSend className="w-6 h-6" />
+          </button>
+        </div>
+        <span className="mt-2 ml-1 block font-bold text-gray-600">
+          {likes.length} {likes.length === 1 ? "Like" : "Likes"}
+        </span>
+
+        {/* Comment Section */}
+        {showCommentBox && (
+          <CommentBox
+            post={post} // Pass the entire post
+            user={user}
+            onClose={() => setShowCommentBox(false)}
+          />
+        )}
       </div>
-      <span className="mt-2 ml-1 block font-bold text-gray-600">
-        {likes.length} {likes.length === 1 ? "Like" : "Likes"}
-      </span>
-
-      {/* Comment Section */}
-      {showCommentBox && (
-        <CommentBox
-          post={post} // Pass the entire post
-          user={user}
-          onClose={() => setShowCommentBox(false)}
-        />
-      )}
     </div>
   );
 };
