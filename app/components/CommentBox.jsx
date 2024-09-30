@@ -11,6 +11,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import Image from "next/image";
 import defaultUser from "../public/default-user.jpg"; // Default user image
+import VideoPlayer from "./VideoPlayer";
 
 export const CommentBox = ({ post, user, onClose }) => {
   const { id, mediaUrl, mediaType, content, authorId } = post;
@@ -117,18 +118,11 @@ export const CommentBox = ({ post, user, onClose }) => {
                 className="object-cover"
               />
             ) : mediaType === "video" ? (
-              <video
-                controls
-                src={mediaUrl}
-                className="w-full h-full object-cover"
-              />
+              <VideoPlayer mediaUrl={mediaUrl} />
             ) : (
               <p>{content}</p>
             )}
           </div>
-
-          {/* Content */}
-          <p className="mt-4 text-gray-700">{content}</p>
         </div>
 
         {/* Comment Section for all screens */}
@@ -156,7 +150,7 @@ export const CommentBox = ({ post, user, onClose }) => {
           <div className="mt-4 space-y-4">
             {comments.length > 0 ? (
               comments.map((comment, index) => (
-                <div key={index} className="flex space-x-2 items-start">
+                <div key={index} className="flex mb-2 space-x-2 items-start">
                   <Image
                     className="rounded-full"
                     src={userPhotos[comment.userId] || defaultUser}
