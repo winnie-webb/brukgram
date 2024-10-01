@@ -107,7 +107,7 @@ export const CommentBox = ({ post, user, onClose }) => {
                 className="object-fill"
               />
             ) : mediaType === "video" ? (
-              <VideoPlayer mediaUrl={mediaUrl} />
+              <VideoPlayer videoSrc={mediaUrl} />
             ) : (
               <p>{content}</p>
             )}
