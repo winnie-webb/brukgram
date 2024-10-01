@@ -23,7 +23,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto py-8 md:px-5">
+    <div className="max-w-4xl mt-10 md:mt-0 mx-auto py-8 md:px-5">
       <div className="md:ml-[20%] ">
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
