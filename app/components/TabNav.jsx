@@ -18,7 +18,7 @@ import { useAuth } from "../context/AuthContext";
 
 const TabNav = () => {
   const router = useRouter();
-  const pathname = usePathname(); // Get current pathname
+  const pathname = usePathname();
   const { user } = useAuth();
 
   const handleNavigation = (path) => {
@@ -27,10 +27,7 @@ const TabNav = () => {
     }
   };
 
-  const isActive = (path) => {
-    // Just returning false for now
-    return false;
-  };
+  const isActive = (path) => false;
 
   return (
     <>
@@ -105,15 +102,15 @@ const TabNav = () => {
           </button>
 
           <button
-            onClick={() => handleNavigation(`/profile/${user.uid}`)}
+            onClick={() => handleNavigation(`/profile/${user?.uid || ""}`)}
             aria-label="Profile"
             className={`flex items-center py-4 mb-4 ${
-              isActive(`/profile/${user.uid}`)
+              isActive(`/profile/${user?.uid || ""}`)
                 ? "text-black font-bold"
                 : "text-black"
             }`}
           >
-            {isActive(`/profile/${user.uid}`) ? (
+            {isActive(`/profile/${user?.uid || ""}`) ? (
               <AiFillUser className="text-3xl" />
             ) : (
               <AiOutlineUser className="text-3xl" />
@@ -123,7 +120,92 @@ const TabNav = () => {
         </div>
 
         {/* Bottom navigation for smaller screens */}
-        {/* Similar structure as above */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden">
+          <div className="fixed top-0 left-0 border-b-2 bg-white z-20 w-full flex justify-between items-center px-4 py-1">
+            <Image
+              src={"/logo.png"}
+              width={100}
+              height={120}
+              alt="Brukgram Logo"
+              className=" object-contain mt-2"
+            ></Image>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleNavigation("/posts")}
+                aria-label="Posts"
+                className={`flex flex-col items-center ${
+                  isActive("/posts") ? "text-black font-bold" : "text-black"
+                }`}
+              >
+                {isActive("/posts") ? (
+                  <AiFillPlusCircle className="text-3xl" />
+                ) : (
+                  <AiOutlinePlusCircle className="text-3xl" />
+                )}
+              </button>
+              <button
+                onClick={() => handleNavigation("/notifications")}
+                aria-label="Notifications"
+                className={`flex flex-col items-center ${
+                  isActive("/notifications")
+                    ? "text-black font-bold"
+                    : "text-black"
+                }`}
+              >
+                {isActive("/notifications") ? (
+                  <AiFillHeart className="text-3xl" />
+                ) : (
+                  <AiOutlineHeart className="text-3xl" />
+                )}
+              </button>
+            </div>
+          </div>
+          <div className="flex justify-around py-3">
+            <button
+              onClick={() => handleNavigation("/")}
+              aria-label="Home"
+              className={`flex flex-col items-center ${
+                isActive("/") ? "text-black font-bold" : "text-black"
+              }`}
+            >
+              {isActive("/") ? (
+                <AiFillHome className="text-3xl" />
+              ) : (
+                <AiOutlineHome className="text-3xl" />
+              )}
+            </button>
+
+            <button
+              onClick={() => handleNavigation("/search")}
+              aria-label="Search"
+              className={`flex flex-col items-center ${
+                isActive("/search") ? "text-black font-bold" : "text-black"
+              }`}
+            >
+              {isActive("/search") ? (
+                <AiFillSearch className="text-3xl" />
+              ) : (
+                <AiOutlineSearch className="text-3xl" />
+              )}
+            </button>
+
+            <button
+              onClick={() => handleNavigation(`/profile/${user?.uid || ""}`)}
+              aria-label="Profile"
+              className={`flex flex-col items-center ${
+                isActive(`/profile/${user?.uid || ""}`)
+                  ? "text-black font-bold"
+                  : "text-black"
+              }`}
+            >
+              {isActive(`/profile/${user?.uid || ""}`) ? (
+                <AiFillUser className="text-3xl" />
+              ) : (
+                <AiOutlineUser className="text-3xl" />
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
