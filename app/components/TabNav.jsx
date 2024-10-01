@@ -14,11 +14,11 @@ import {
   AiFillUser,
 } from "react-icons/ai";
 import Image from "next/image";
-import logo from "../public/logo.png";
+import { useAuth } from "../context/AuthContext";
 const TabNav = () => {
   const router = useRouter();
   const pathname = usePathname(); // Get current pathname
-
+  const { user } = useAuth();
   const handleNavigation = (path) => {
     router.push(path);
   };
@@ -32,7 +32,7 @@ const TabNav = () => {
         {/* Sidebar for larger screens */}
         <div className="hidden fixed top-0 left-0 w-16 p-6 md:flex md:flex-col md:w-1/5 bg-white border-r border-gray-200 shadow-lg h-full">
           <Image
-            src={logo}
+            src="/logo.png"
             width={150}
             height={150}
             alt="Brukgram Logo"
@@ -118,7 +118,7 @@ const TabNav = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden">
           <div className="fixed top-0 left-0 border-b-2 bg-white z-20 w-full flex justify-between items-center px-4 py-1">
             <Image
-              src={logo}
+              src="/logo.png"
               width={100}
               height={120}
               alt="Brukgram Logo"

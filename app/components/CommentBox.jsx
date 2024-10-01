@@ -10,7 +10,6 @@ import {
 import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import Image from "next/image";
-import defaultUser from "../public/default-user.jpg"; // Default user image
 import VideoPlayer from "./VideoPlayer";
 
 export const CommentBox = ({ post, user, onClose }) => {
@@ -51,10 +50,10 @@ export const CommentBox = ({ post, user, onClose }) => {
           if (userSnap.exists()) {
             const userData = userSnap.data();
             newUserNames[userId] = userData.displayName;
-            newUserPhotos[userId] = userData.profilePictureUrl || defaultUser;
+            newUserPhotos[userId] =
+              userData.profilePictureUrl || "/default-user.jpg";
           } else {
             newUserNames[userId] = "Unknown";
-            newUserPhotos[userId] = defaultUser;
           }
         }
       });
@@ -143,7 +142,7 @@ export const CommentBox = ({ post, user, onClose }) => {
                 <div key={index} className="flex mb-2 space-x-2 items-start">
                   <Image
                     className="rounded-full"
-                    src={userPhotos[comment.userId] || defaultUser}
+                    src={userPhotos[comment.userId] || "/default-user.jpg"}
                     alt="Profile"
                     width={30}
                     height={30}
@@ -182,7 +181,7 @@ export const CommentBox = ({ post, user, onClose }) => {
               <div key={index} className="flex space-x-2 mb-2 items-start">
                 <Image
                   className="rounded-full"
-                  src={userPhotos[comment.userId] || defaultUser}
+                  src={userPhotos[comment.userId] || "/default-user.jpg"}
                   alt="Profile"
                   width={30}
                   height={30}

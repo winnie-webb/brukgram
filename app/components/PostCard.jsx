@@ -14,7 +14,6 @@ import VideoPlayer from "./VideoPlayer"; // Assuming you have a VideoPlayer comp
 import { useAuth } from "../context/AuthContext";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { CommentBox } from "./CommentBox";
-import defaultUser from "../public/default-user.jpg";
 import { FiMessageCircle, FiSend } from "react-icons/fi";
 import Link from "next/link";
 
@@ -80,7 +79,7 @@ const PostCard = ({ post }) => {
           <>
             <Image
               className="rounded-full w-12 h-12"
-              src={postUser.profilePictureUrl || defaultUser}
+              src={postUser.profilePictureUrl || "/default-user.jpg"}
               alt="Profile"
               width={50}
               height={50}
