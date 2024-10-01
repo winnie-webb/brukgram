@@ -66,7 +66,7 @@ export const CommentBox = ({ post, user, onClose }) => {
     if (comments.length > 0) {
       fetchUserNames();
     }
-  }, [comments]);
+  }, [comments, userNames, userPhotos]);
 
   // Handle Comment Submission
   const handleCommentSubmit = async (e) => {
