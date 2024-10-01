@@ -21,7 +21,7 @@ const VideoPlayer = ({ videoSrc }) => {
       <video
         ref={videoRef}
         src={videoSrc}
-        className="h-full object-contain"
+        className="h-full object-cover"
         playsInline
         controls={false}
       />
