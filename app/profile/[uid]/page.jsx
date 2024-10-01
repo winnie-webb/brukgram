@@ -1,70 +1,104 @@
 "use client";
-import { useEffect, useState } from "react";
-import { auth } from "../../../firebase"; // Firebase auth instance
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../firebase"; // Firestore instance
-import Link from "next/link";
+import VideoPlayer from "@/app/components/VideoPlayer";
+import { useAuth } from "@/app/context/AuthContext";
+import { db } from "@/firebase";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
-const ProfilePage = ({ params }) => {
-  const uid = params.uid;
-  const [userData, setUserData] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null);
-
+const ProfilePage = () => {
+  const [userProfile, setUserProfile] = useState({});
+  const [userPosts, setUserPosts] = useState([]);
+  const { user } = useAuth();
   useEffect(() => {
-    // Get the currently logged-in user ID
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setCurrentUserId(user.uid);
+    console.log(user);
+    const fetchUserProfile = async () => {
+      // Fetch user data from Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUserProfile(userSnap.data());
       } else {
-        setCurrentUserId(null); // Reset if not logged in
-      }
-    });
-
-    return () => unsubscribe(); // Clean up the subscription
-  }, []);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (uid) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", uid));
-          if (userDoc.exists()) {
-            setUserData(userDoc.data());
-          } else {
-            console.error("User not found");
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
+        console.log("No such user!");
       }
     };
 
-    if (currentUserId) {
-      console.log("User Logged In");
-      fetchUserData(); // Fetch only if logged in
-    }
-  }, [uid, currentUserId]);
+    fetchUserProfile();
+  }, [user]);
 
-  if (!userData) return <div>Loading...</div>;
-  const isOwnProfile = currentUserId === uid; // Check if viewing own profile
+  useEffect(() => {
+    const postsRef = collection(db, "posts");
+    const unsubscribe = onSnapshot(postsRef, (snapshot) => {
+      const postsData = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((post) => post.authorId === user.uid); // Filter posts by userId
+
+      setUserPosts(postsData);
+    });
+
+    return () => unsubscribe();
+  }, [user.uid]);
 
   return (
-    <div className="ml-[20%]">
-      <h1>{userData.email}</h1>
-      <p>{userData.bio}</p>
-
-      {/* Render additional options based on profile view */}
-      {isOwnProfile ? (
-        <div>
-          <Link href={"/posts"}>
-            <button>Create Post</button>
-          </Link>
-          <button>Edit Profile</button>
-          {/* Render other personal options like changing password */}
+    <div className="py-2 md:w-60% md:ml-[20%] md:p-10 overflow-clip">
+      <div className="md:w-[70%] mx-auto">
+        <div className="flex relative items-center mb-4 p-2">
+          <Image
+            src={userProfile.profilePictureUrl || "/default-user.jpg"} // Default profile picture
+            alt="Profile"
+            className="rounded-full border-4 border-gray-300 mr-4"
+            width={128}
+            height={128}
+          />
+          <div>
+            <h1 className="text-3xl font-bold">{userProfile.displayName}</h1>
+            <p className="text-gray-600">
+              {userProfile.bio || "No bio available."}
+            </p>
+            <div className="flex mt-2 space-x-4">
+              <div>
+                <span className="font-semibold">{userPosts.length}</span> Posts
+              </div>
+              <div>
+                <span className="font-semibold">
+                  {userProfile.followers?.length || 0}
+                </span>{" "}
+                Followers
+              </div>
+              <div>
+                <span className="font-semibold">
+                  {userProfile.following?.length || 0}
+                </span>{" "}
+                Following
+              </div>
+            </div>
+          </div>
         </div>
-      ) : (
-        <button>Follow</button> // Show follow button for other users
-      )}
+
+        <div className="grid grid-cols-3 gap-[0.2rem] h-[100vh]">
+          {userPosts.length > 0 ? (
+            userPosts.map((post) =>
+              post.mediaType === "image" ? (
+                <div key={post.id} className="relative h-full">
+                  <Image
+                    src={post.mediaUrl}
+                    alt="Post"
+                    className="object-cover"
+                    fill
+                  />
+                </div>
+              ) : (
+                <VideoPlayer
+                  key={post.id}
+                  videoSrc={post.mediaUrl}
+                ></VideoPlayer>
+              )
+            )
+          ) : (
+            <p>No posts available.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
