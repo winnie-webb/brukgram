@@ -17,26 +17,27 @@ const VideoPlayer = ({ videoSrc }) => {
   };
 
   return (
-    <div className="relative w-full h-full">
-      <video
-        ref={videoRef}
-        src={videoSrc}
-        className="w-full h-full"
-        onClick={handlePlayPause}
-        playsInline
-        controls={false} // Disable native controls
-      />
-
-      {/*  play button, shown only when video is paused */}
-      {!isPlaying && (
-        <button
+    <div className="relative overflow-hidden">
+      <div className="relative">
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          className="rounded-lg"
           onClick={handlePlayPause}
-          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
-          aria-label="Play video"
-        >
-          <IoIosPlay className="text-white text-6xl" />
-        </button>
-      )}
+          playsInline
+          controls={false} // Disable native controls
+        />
+
+        {!isPlaying && (
+          <button
+            onClick={handlePlayPause}
+            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            aria-label="Play video"
+          >
+            <IoIosPlay className="text-white text-6xl" />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

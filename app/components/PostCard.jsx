@@ -93,16 +93,13 @@ const PostCard = ({ post }) => {
           <p className="font-semibold">Anonymous</p>
         )}
       </div>
-
-      <div className="relative w-full mb-1 aspect-w-16 aspect-h-16">
-        {mediaType === "image" ? (
+      {mediaType === "image" ? (
+        <div className="relative w-full mb-1 aspect-w-16 aspect-h-16">
           <Image className="object-cover" src={mediaUrl} alt={content} fill />
-        ) : mediaType === "video" ? (
-          <VideoPlayer videoSrc={mediaUrl} />
-        ) : (
-          <p className="p-4">{content}</p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <VideoPlayer videoSrc={mediaUrl} />
+      )}
 
       <div className="px-2 md:px-0">
         <p className="text-gray-800">{content}</p>
