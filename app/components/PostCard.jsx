@@ -78,7 +78,7 @@ const PostCard = ({ post }) => {
         {postUser ? (
           <>
             <Image
-              className="rounded-full w-12 h-12"
+              className="rounded-full ml-2 w-12 h-12"
               src={postUser.profilePictureUrl || "/default-user.jpg"}
               alt="Profile"
               width={50}
