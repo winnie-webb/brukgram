@@ -1,17 +1,20 @@
 "use client";
+import FollowButton from "@/app/components/FollowBtn";
 import VideoPlayer from "@/app/components/VideoPlayer";
 import { useAuth } from "@/app/context/AuthContext";
 import { db } from "@/firebase";
 import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const ProfilePage = () => {
   const [userProfile, setUserProfile] = useState({});
   const [userPosts, setUserPosts] = useState([]);
   const { user } = useAuth();
+  const params = useParams();
+  const currentUserProfileId = params.uid;
   useEffect(() => {
-    console.log(user);
     const fetchUserProfile = async () => {
       // Fetch user data from Firestore
       const userRef = doc(db, "users", user.uid);
@@ -40,7 +43,7 @@ const ProfilePage = () => {
   }, [user.uid]);
 
   return (
-    <div className="py-2 md:w-60% md:ml-[20%] md:p-10 overflow-clip">
+    <div className="py-2 mt-10 md:mt-0 md:w-60% md:ml-[20%] md:p-10">
       <div className="md:w-[70%] mx-auto">
         <div className="flex relative items-center mb-4 p-2">
           <Image
@@ -51,7 +54,10 @@ const ProfilePage = () => {
             height={128}
           />
           <div>
-            <h1 className="text-3xl font-bold">{userProfile.displayName}</h1>
+            <div className="flex gap-x-2">
+              <h1 className="text-3xl font-bold">{userProfile.displayName}</h1>
+              <FollowButton targetUserId={currentUserProfileId}></FollowButton>
+            </div>
             <p className="text-gray-600">
               {userProfile.bio || "No bio available."}
             </p>
