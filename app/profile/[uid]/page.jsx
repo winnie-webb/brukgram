@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { auth } from "../../../firebase"; // Firebase auth instance
 import { doc, getDoc } from "firebase/firestore";
