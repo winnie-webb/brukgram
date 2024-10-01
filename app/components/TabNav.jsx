@@ -26,8 +26,7 @@ const TabNav = () => {
       router.push(path);
     }
   };
-  console.log("Current pathname:", pathname);
-  console.log("User:", user);
+
   const isActive = (path) => {
     // Just returning false for now
     return false;
