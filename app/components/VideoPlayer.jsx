@@ -17,7 +17,10 @@ const VideoPlayer = ({ videoSrc }) => {
   };
 
   return (
-    <div onClick={handlePlayPause} className="relative h-full">
+    <div
+      onClick={handlePlayPause}
+      className="relative h-full flex justify-center bg-black"
+    >
       <video
         ref={videoRef}
         src={videoSrc}
