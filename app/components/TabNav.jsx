@@ -21,13 +21,18 @@ import { useAuth } from "../context/AuthContext";
 const TabNav = ({ children }) => {
   const pathname = usePathname();
   const { user } = useAuth();
-
+  const router = useRouter();
   const noLayoutRoutes = ["/login", "/signup", "/shorts"];
 
   // If the current route is in the noLayoutRoutes array, render only the children
   if (noLayoutRoutes.includes(pathname)) {
     return <>{children}</>;
   }
+  const handleNavigation = (path) => {
+    if (path) {
+      router.push(path);
+    }
+  };
   const isActive = (path) => false;
 
   return (
