@@ -1,73 +1,81 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
-import { IoArrowBack } from "react-icons/io5"; // Icons for like, comment, and back arrow
+import { IoArrowBack } from "react-icons/io5"; // Back arrow
 import { useRouter } from "next/navigation"; // For navigation
-import Short from "./short";
+import Short from "./Short";
 
 export default function Shorts() {
   const [shorts, setShorts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter(); // Get the router for navigation
+  const [page, setPage] = useState(0);
+  const router = useRouter();
+  const lastVideoRef = useRef();
 
-  const scrollRef = useRef(null); // Reference to the scrollable container
-
-  useEffect(() => {
-    const fetchShorts = async () => {
-      setLoading(true);
-      try {
-        const q = query(
-          collection(db, "posts"),
-          where("mediaType", "==", "video")
-        );
-        const querySnapshot = await getDocs(q);
-        const posts = querySnapshot.docs.map((doc) => doc.data());
-        setShorts(posts);
-      } catch (error) {
-        console.error("Error fetching shorts:", error);
-      }
-      setLoading(false);
-    };
-
-    fetchShorts();
+  // Fetch shorts from Firebase
+  const fetchShorts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const q = query(
+        collection(db, "posts"),
+        where("mediaType", "==", "video")
+      );
+      const querySnapshot = await getDocs(q);
+      const posts = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setShorts((prev) => [...prev, ...posts]); // Append previous videos to the list
+    } catch (error) {
+      console.error("Error fetching shorts:", error);
+    }
+    setLoading(false);
   }, []);
 
-  const handleScroll = () => {
-    const container = scrollRef.current;
-    if (container) {
-      // Check if the user has scrolled to the bottom
-      if (
-        container.scrollTop + container.clientHeight >=
-        container.scrollHeight
-      ) {
-        // If at the bottom, reset scroll to the top (loop effect)
-        container.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    }
-  };
+  useEffect(() => {
+    fetchShorts();
+  }, [fetchShorts, page]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // Infinite scrolling function to load more videos when reaching the end
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading) {
+          setPage((prevPage) => prevPage + 1); // Load the next set of videos
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (lastVideoRef.current) {
+      observer.observe(lastVideoRef.current);
+    }
+
+    return () => {
+      if (lastVideoRef.current) {
+        observer.unobserve(lastVideoRef.current);
+      }
+    };
+  }, [loading]);
 
   return (
-    <div
-      ref={scrollRef}
-      onScroll={handleScroll}
-      className="shorts-container snap-y snap-mandatory h-screen overflow-y-scroll bg-black relative"
-    >
+    <div className=" snap-y snap-mandatory h-screen overflow-y-scroll bg-white relative">
       {/* Back arrow */}
       <button
-        className="absolute top-14 left-2 text-white z-10"
+        className="fixed top-5 left-4 text-white z-10"
         onClick={() => router.back()}
       >
         <IoArrowBack size={28} />
       </button>
 
-      {/* Render shorts */}
       {shorts.map((short, index) => (
-        <Short key={index} short={short} />
+        <Short
+          key={index}
+          short={short}
+          isLast={index === shorts.length - 1}
+          lastVideoRef={lastVideoRef}
+        />
       ))}
     </div>
   );
