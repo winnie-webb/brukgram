@@ -50,20 +50,20 @@ const ProfilePage = () => {
   }, [user.uid]);
 
   return (
-    <div className="py-2 mt-10 md:mt-0 md:w-60% md:ml-[20%] md:p-10">
+    <div className="py-2 mt-14 md:mt-0 md:w-60% md:ml-[20%] md:p-10">
       <div className="md:w-[70%] mx-auto">
-        <div className="flex relative items-center mb-4 p-2">
+        <div className="flex justify-center md:justify-normal relative items-center mb-4">
           <Image
             src={userProfile.profilePictureUrl || "/default-user.jpg"}
             alt="Profile"
-            className="rounded-full w-40 h-40 mr-4"
+            className="rounded-full w-20 h-20 mr-4"
             width={128}
             height={128}
           />
 
           <div>
             <div className="flex gap-x-2">
-              <h1 className="text-3xl font-bold">{userProfile.displayName}</h1>
+              <h1 className="text-2xl font-bold">{userProfile.displayName}</h1>
 
               <FollowButton targetUserId={currentUserProfileId}></FollowButton>
             </div>
@@ -101,7 +101,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-[0.2rem] h-[100vh]">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.1rem] h-[100vh]">
           {userPosts.length > 0 ? (
             userPosts.map((post) =>
               post.mediaType === "image" ? (
