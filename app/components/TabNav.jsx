@@ -22,7 +22,7 @@ const TabNav = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-  console.log(pathname);
+
   useEffect(() => {
     if (!user && pathname !== "/signup") {
       router.push("/login");
@@ -33,12 +33,11 @@ const TabNav = () => {
       router.push(path);
     }
   };
-
   const isActive = (path) => false;
 
   return (
     <>
-      <div className="flex flex-col group md:flex-row p-4">
+      <div className="flex flex-col z-50 group md:flex-row p-4">
         {/* Sidebar for larger screens */}
         <div className="hidden fixed top-0 left-0 w-16 p-6 md:flex md:flex-col md:w-1/5 bg-white border-r border-gray-200 shadow-lg h-full">
           <Image
@@ -140,7 +139,7 @@ const TabNav = () => {
         </div>
 
         {/* Bottom navigation for smaller screens */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg md:hidden">
           <div className="fixed top-0 left-0 border-b-2 bg-white z-20 w-full flex justify-between items-center px-4 py-1">
             <Image
               src={"/logo.png"}
