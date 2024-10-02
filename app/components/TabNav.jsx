@@ -23,11 +23,15 @@ const TabNav = ({ children }) => {
   const { user } = useAuth();
   const router = useRouter();
   const noLayoutRoutes = ["/login", "/signup", "/shorts"];
-
-  // If the current route is in the noLayoutRoutes array, render only the children
+  useEffect(() => {
+    if (!user && pathname !== "/signup") {
+      router.push("/login");
+    }
+  }, [pathname, user, router]);
   if (noLayoutRoutes.includes(pathname)) {
     return <>{children}</>;
   }
+
   const handleNavigation = (path) => {
     if (path) {
       router.push(path);
