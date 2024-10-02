@@ -122,7 +122,7 @@ export default function CreatePost() {
     });
 
   return (
-    <div className="create-post-container mt-14 md:mt-0 max-w-lg mx-auto p-4">
+    <div className="create-post-container my-14 md:my-0 max-w-lg mx-auto p-4">
       <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
         <textarea
           className="border rounded-md p-2"
