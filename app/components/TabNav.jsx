@@ -37,7 +37,7 @@ const TabNav = ({ children }) => {
 
   return (
     <>
-      <div className="flex flex-col z-50 group md:flex-row p-4">
+      <div className="flex flex-col z-20 group md:flex-row p-4">
         {/* Sidebar for larger screens */}
         <div className="hidden fixed top-0 left-0 w-16 p-6 md:flex md:flex-col md:w-1/5 bg-white border-r border-gray-200 shadow-lg h-full">
           <Image
