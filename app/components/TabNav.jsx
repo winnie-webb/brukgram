@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   AiOutlineHome,
@@ -22,7 +22,12 @@ const TabNav = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
-
+  console.log(pathname);
+  useEffect(() => {
+    if (!user && pathname !== "/signup") {
+      router.push("/login");
+    }
+  }, [pathname, user, router]);
   const handleNavigation = (path) => {
     if (path) {
       router.push(path);
