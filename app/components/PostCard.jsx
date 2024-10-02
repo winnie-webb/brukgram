@@ -84,7 +84,7 @@ const PostCard = ({ post }) => {
               width={50}
               height={50}
             />
-            <Link href={`/profile/${user.uid}`} className="font-semibold ml-2">
+            <Link href={`/profile/${authorId}`} className="font-semibold ml-2">
               {postUser.displayName}
             </Link>
           </>
