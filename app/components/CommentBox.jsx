@@ -115,7 +115,7 @@ export const CommentBox = ({ post, user, onClose }) => {
         </div>
 
         {/* Comment Section for all screens */}
-        <div className="w-full md:w-2/5 p-4 border-l md:overflow-y-auto">
+        <div className="w-full md:w-2/5 p-4 border-l md:overflow-y-auto text-black">
           <form
             onSubmit={handleCommentSubmit}
             className="flex space-x-2 items-center"
@@ -125,7 +125,7 @@ export const CommentBox = ({ post, user, onClose }) => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Add a comment..."
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md "
             />
             <button
               type="submit"
