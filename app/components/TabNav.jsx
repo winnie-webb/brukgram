@@ -18,21 +18,16 @@ import { BiMoviePlay, BiSolidMovie, BiSolidMoviePlay } from "react-icons/bi";
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
 
-const TabNav = () => {
-  const router = useRouter();
+const TabNav = ({ children }) => {
   const pathname = usePathname();
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (!user && pathname !== "/signup") {
-      router.push("/login");
-    }
-  }, [pathname, user, router]);
-  const handleNavigation = (path) => {
-    if (path) {
-      router.push(path);
-    }
-  };
+  const noLayoutRoutes = ["/login", "/signup", "/shorts"];
+
+  // If the current route is in the noLayoutRoutes array, render only the children
+  if (noLayoutRoutes.includes(pathname)) {
+    return <>{children}</>;
+  }
   const isActive = (path) => false;
 
   return (
