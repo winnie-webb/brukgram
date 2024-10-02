@@ -13,6 +13,8 @@ import {
   AiFillHeart,
   AiFillUser,
 } from "react-icons/ai";
+import { BiMoviePlay, BiSolidMovie, BiSolidMoviePlay } from "react-icons/bi";
+
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
 
@@ -55,7 +57,20 @@ const TabNav = () => {
             )}
             <span className="ml-4">Home</span>
           </button>
-
+          <button
+            onClick={() => handleNavigation("/shorts")}
+            aria-label="Shorts"
+            className={`flex items-center py-4 mb-4 ${
+              isActive("/shorts") ? "text-black font-bold" : "text-black"
+            }`}
+          >
+            {isActive("/shorts") ? (
+              <BiSolidMoviePlay className="text-3xl" />
+            ) : (
+              <BiMoviePlay className="text-3xl" />
+            )}
+            <span className="ml-4">Shorts</span>
+          </button>
           <button
             onClick={() => handleNavigation("/search")}
             aria-label="Search"
@@ -186,6 +201,19 @@ const TabNav = () => {
                 <AiFillSearch className="text-3xl" />
               ) : (
                 <AiOutlineSearch className="text-3xl" />
+              )}
+            </button>
+            <button
+              onClick={() => handleNavigation("/shorts")}
+              aria-label="Shorts"
+              className={`flex flex-col items-center ${
+                isActive("/shorts") ? "text-black font-bold" : "text-black"
+              }`}
+            >
+              {isActive("/shorts") ? (
+                <BiSolidMoviePlay className="text-3xl" />
+              ) : (
+                <BiMoviePlay className="text-3xl" />
               )}
             </button>
 
