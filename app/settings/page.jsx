@@ -130,7 +130,7 @@ const SettingsPage = () => {
               alt="Profile"
               width={128}
               height={128}
-              className="rounded-full"
+              className="rounded-full w-14 h-14"
             />
           </div>
           <input
