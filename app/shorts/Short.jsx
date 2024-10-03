@@ -1,5 +1,4 @@
-"use client";
-
+import { useEffect, useRef, useState } from "react";
 import { db } from "@/firebase";
 import {
   collection,
@@ -11,14 +10,13 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
-import { IoChatbubbleOutline, IoHeartOutline, IoHeart } from "react-icons/io5"; // Import filled heart icon
+import { IoChatbubbleOutline, IoHeartOutline, IoHeart } from "react-icons/io5";
 import FollowButton from "../components/FollowBtn";
 import { CommentBox } from "../components/CommentBox";
 import { useAuth } from "../context/AuthContext";
 
-function Short({ short, lastVideoRef, isLast }) {
-  const [isPlaying, setIsPlaying] = useState(true);
+function Short({ short, lastVideoRef }) {
+  const [isPlaying, setIsPlaying] = useState(false);
   const { user } = useAuth();
   const videoRef = useRef(null);
   const [author, setAuthor] = useState(null);
@@ -27,6 +25,7 @@ function Short({ short, lastVideoRef, isLast }) {
   const [likes, setLikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
 
+  // Fetch the author of the post
   useEffect(() => {
     const fetchAuthorProfile = async () => {
       try {
@@ -45,6 +44,7 @@ function Short({ short, lastVideoRef, isLast }) {
     fetchAuthorProfile();
   }, [short.authorId]);
 
+  // Fetch and subscribe to comments
   useEffect(() => {
     const commentsRef = collection(db, "posts", short.id, "comments");
 
@@ -61,15 +61,15 @@ function Short({ short, lastVideoRef, isLast }) {
     };
   }, [short.id]);
 
-  // Handle likes
+  // Fetch and subscribe to likes
   useEffect(() => {
     const fetchLikes = async () => {
       const likesRef = collection(db, "posts", short.id, "likes");
 
       const unsubscribeLikes = onSnapshot(likesRef, (snapshot) => {
-        setLikes(snapshot.docs.length); // Total number of likes
+        setLikes(snapshot.docs.length);
         const userLikes = snapshot.docs.find((doc) => doc.id === user?.uid);
-        setHasLiked(!!userLikes); // Check if the current user has liked the post
+        setHasLiked(!!userLikes);
       });
 
       return () => unsubscribeLikes();
@@ -78,56 +78,30 @@ function Short({ short, lastVideoRef, isLast }) {
     if (user) fetchLikes();
   }, [short.id, user]);
 
-  // Handle play/pause on video click
+  // Observer to detect if video is in view and handle autoplay and mute/unmute
+
   const togglePlayPause = () => {
-    if (isPlaying) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play();
+    const video = videoRef.current;
+    if (video) {
+      if (isPlaying) {
+        video.pause();
+        video.muted = true;
+      } else {
+        video.play();
+        video.muted = false; // Unmute when playing
+      }
+      setIsPlaying(!isPlaying);
     }
-    setIsPlaying(!isPlaying);
   };
 
-  // Handle autoplay control based on visibility using IntersectionObserver
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            videoRef.current.play();
-            videoRef.current.muted = false; // Unmute video when visible
-          } else {
-            videoRef.current.pause();
-            videoRef.current.muted = true; // Mute video when not visible
-          }
-        });
-      },
-      { threshold: 0.5 } // Trigger when 50% of the video is visible
-    );
-
-    const currentVideoRef = videoRef.current;
-    if (currentVideoRef) {
-      observer.observe(currentVideoRef);
-    }
-
-    return () => {
-      if (currentVideoRef) {
-        observer.unobserve(currentVideoRef);
-      }
-    };
-  }, []);
-
-  // Handle like button click
   const handleLike = async () => {
-    if (!user) return; // User must be logged in
+    if (!user) return;
 
     const likeRef = doc(db, "posts", short.id, "likes", user.uid);
 
     if (hasLiked) {
-      // Unlike the post
       await deleteDoc(likeRef);
     } else {
-      // Like the post
       await setDoc(likeRef, {
         userId: user.uid,
       });
@@ -136,19 +110,19 @@ function Short({ short, lastVideoRef, isLast }) {
 
   return (
     author && (
-      <div className="snap-start h-screen w-full relative flex justify-center items-center md:w-[30%] md:mx-auto">
+      <div
+        className="snap-start h-screen w-full relative flex justify-center items-center md:w-[30%] md:mx-auto"
+        ref={lastVideoRef} // Assign ref to this video if it's the last one
+      >
         <div className="relative w-full h-full">
-          {/* Video element */}
           <video
             ref={videoRef}
             className="w-full h-full object-cover"
             src={short.mediaUrl}
-            autoPlay
-            loop
             onClick={togglePlayPause}
+            loop
           />
 
-          {/* Video overlay */}
           <div className="absolute bottom-8 left-4 text-white z-10">
             <div className="flex items-center space-x-2 mb-2">
               <Image
@@ -164,7 +138,6 @@ function Short({ short, lastVideoRef, isLast }) {
             <p>{short.content}</p>
           </div>
 
-          {/* Likes and Comments */}
           {comments && (
             <div className="absolute bottom-8 right-4 flex flex-col space-y-4 z-10">
               <button
@@ -172,7 +145,7 @@ function Short({ short, lastVideoRef, isLast }) {
                 className="flex flex-col items-center"
               >
                 {hasLiked ? (
-                  <IoHeart className="text-red-500" size={28} /> // Use filled heart icon
+                  <IoHeart className="text-red-500" size={28} />
                 ) : (
                   <IoHeartOutline className="text-white" size={28} />
                 )}
