@@ -9,6 +9,7 @@ import Cropper from "react-easy-crop"; // Image cropping tool
 import { Slider, Button } from "@mui/material"; // Slider for zoom
 import { IoIosPlay } from "react-icons/io"; // Play icon for video
 import VideoPlayer from "../components/VideoPlayer"; // Custom video player component
+import { useRouter } from "next/navigation";
 
 export default function CreatePost() {
   const [content, setContent] = useState("");
@@ -17,7 +18,7 @@ export default function CreatePost() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth(); // Get the current user from AuthContext
-
+  const router = useRouter();
   // Cropping state
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -74,9 +75,7 @@ export default function CreatePost() {
         mediaType: checkMediaType(media),
       });
 
-      setContent(""); // Clear input after submitting
-      setMedia(null); // Reset the media state
-      setLoading(false);
+      router.back();
     } catch (err) {
       setError("Failed to create post: " + err.message);
       setLoading(false);
