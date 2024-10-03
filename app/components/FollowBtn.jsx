@@ -7,6 +7,9 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
+  setDoc,
+  collection,
+  serverTimestamp,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 
@@ -55,6 +58,21 @@ const FollowButton = ({ targetUserId }) => {
         });
         await updateDoc(targetUserRef, {
           followers: arrayUnion(user.uid),
+        });
+        const followerDoc = await getDoc(doc(db, "users", user.uid));
+        const followerData = followerDoc.data();
+
+        // Create a notification for the followed user
+        const notificationRef = doc(
+          collection(db, "users", targetUserId, "notifications")
+        );
+        await setDoc(notificationRef, {
+          type: "follow",
+          message: `${followerData.displayName} started following you`,
+          senderId: user.uid,
+          senderDisplayName: followerData.displayName, // Store the follower's display name
+          timestamp: serverTimestamp(),
+          isRead: false,
         });
         setIsFollowing(true);
       }

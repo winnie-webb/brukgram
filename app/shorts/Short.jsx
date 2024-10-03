@@ -14,6 +14,7 @@ import { IoChatbubbleOutline, IoHeartOutline, IoHeart } from "react-icons/io5";
 import FollowButton from "../components/FollowBtn";
 import { CommentBox } from "../components/CommentBox";
 import { useAuth } from "../context/AuthContext";
+import sendNotification from "../utils/sendNotification";
 
 function Short({ short, lastVideoRef }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -105,6 +106,13 @@ function Short({ short, lastVideoRef }) {
       await setDoc(likeRef, {
         userId: user.uid,
       });
+      sendNotification(
+        user.uid,
+        short.id,
+        short.authorId,
+        "like",
+        "liked your post"
+      );
     }
   };
 
@@ -112,7 +120,7 @@ function Short({ short, lastVideoRef }) {
     author && (
       <div
         className="snap-start h-screen w-full relative flex justify-center items-center md:w-[30%] md:mx-auto"
-        ref={lastVideoRef} // Assign ref to this video if it's the last one
+        ref={lastVideoRef}
       >
         <div className="relative w-full h-full">
           <video
