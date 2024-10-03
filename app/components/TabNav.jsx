@@ -129,6 +129,16 @@ const TabNav = ({ children }) => {
             )}
             <span className="ml-4">Notifications</span>
           </button>
+          <button
+            onClick={() => handleNavigation(`/inbox`)}
+            aria-label="Profile"
+            className={`flex items-center py-4 mb-4 ${
+              isActive(`/inbox`) ? "text-black font-bold" : "text-black"
+            }`}
+          >
+            <FiMessageCircle className="text-3xl"></FiMessageCircle>
+            <span className="ml-4">Inbox</span>
+          </button>
 
           <button
             onClick={() => handleNavigation(`/profile/${user?.uid || ""}`)}
