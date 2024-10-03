@@ -131,7 +131,7 @@ const TabNav = ({ children }) => {
           </button>
           <button
             onClick={() => handleNavigation(`/inbox`)}
-            aria-label="Profile"
+            aria-label="Inbox"
             className={`flex items-center py-4 mb-4 ${
               isActive(`/inbox`) ? "text-black font-bold" : "text-black"
             }`}
