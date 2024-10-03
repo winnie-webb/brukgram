@@ -106,7 +106,10 @@ const SettingsPage = () => {
       setError("Error logging out.");
     }
   };
-
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
   return (
     <div className="p-4 mt-10 md:mt-0 md:w-60% md:ml-[20%] md:p-10">
       <div className="flex justify-between">
