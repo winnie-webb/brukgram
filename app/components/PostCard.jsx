@@ -103,8 +103,6 @@ const PostCard = ({ post }) => {
       )}
 
       <div className="px-2 md:px-0">
-        <p className="text-gray-800">{content}</p>
-
         <div className="flex gap-x-2 mt-2 items-center">
           <button onClick={handleLike} className="flex items-center">
             {hasLiked ? (
@@ -128,6 +126,7 @@ const PostCard = ({ post }) => {
         <span className="mt-2 ml-1 block font-bold text-gray-600">
           {likes.length} {likes.length === 1 ? "Like" : "Likes"}
         </span>
+        <p className=" ml-1">{content}</p>
 
         {/* Comment Section */}
         {showCommentBox && (
