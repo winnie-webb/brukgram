@@ -15,7 +15,6 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [passwordChecker, setPasswordChecker] = useState("");
   const { currentUser, loading } = useAuth();
   const [error, setError] = useState(null);
 
@@ -41,9 +40,6 @@ const Signup = () => {
     password: Yup.string()
       .required("Password is required")
       .min(6, "Password must be at least 6 characters"),
-    confirmPassword: Yup.string()
-      .required("Please confirm your password")
-      .oneOf([Yup.ref("password")], "Passwords don't match"),
     displayName: Yup.string().required("Display name is required"),
   });
 
@@ -129,26 +125,7 @@ const Signup = () => {
               <p className="text-red-500">{errors.password.message}</p>
             )}
           </div>
-          <div>
-            <label
-              htmlFor="password-check"
-              className="block text-sm font-medium "
-            >
-              Confirm password
-            </label>
-            <input
-              type="password"
-              id="password-check"
-              value={passwordChecker}
-              {...register("confirmPassword", {
-                onBlur: (e) => setPasswordChecker(e.target.value),
-              })} // Add onBlur handler
-              className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500">{errors.confirmPassword.message}</p>
-            )}
-          </div>
+
           <button
             type="submit"
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-200"
