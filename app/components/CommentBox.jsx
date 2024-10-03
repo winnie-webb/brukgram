@@ -1,4 +1,3 @@
-"use client";
 import { db } from "../../firebase";
 import {
   collection,
@@ -7,7 +6,7 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react"; // Import useCallback
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import Image from "next/image";
 import VideoPlayer from "./VideoPlayer";
@@ -21,6 +20,32 @@ export const CommentBox = ({ post, user, onClose }) => {
   const [userPhotos, setUserPhotos] = useState({}); // Store user profile photos
   const modalRef = useRef(null);
 
+  // Fetch usernames and photos only when comments change or on initial render
+  const fetchUsernamesAndPhotos = useCallback(async () => {
+    const newUserNames = { ...userNames };
+    const newUserPhotos = { ...userPhotos };
+
+    const userFetchPromises = comments.map(async (comment) => {
+      const { userId } = comment;
+      if (!newUserNames[userId]) {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          newUserNames[userId] = userData.displayName;
+          newUserPhotos[userId] =
+            userData.profilePictureUrl || "/default-user.jpg";
+        } else {
+          newUserNames[userId] = "Unknown";
+        }
+      }
+    });
+
+    await Promise.all(userFetchPromises);
+    setUserNames(newUserNames);
+    setUserPhotos(newUserPhotos);
+  }, [comments, userNames, userPhotos]); // Memoize the function
+
   useEffect(() => {
     const commentsRef = collection(db, "posts", id, "comments");
 
@@ -30,44 +55,13 @@ export const CommentBox = ({ post, user, onClose }) => {
         ...doc.data(),
       }));
       setComments(commentsData);
+      fetchUsernamesAndPhotos(); // Fetch usernames and photos when new comments arrive
     });
 
     return () => {
       unsubscribeComments();
     };
-  }, [id]);
-
-  // Fetch the username and photo for each comment
-  useEffect(() => {
-    const fetchUserNames = async () => {
-      const newUserNames = { ...userNames }; // Copy current state
-      const newUserPhotos = { ...userPhotos }; // Copy current photo state
-
-      const userFetchPromises = comments.map(async (comment) => {
-        const { userId } = comment;
-        if (!newUserNames[userId]) {
-          const userRef = doc(db, "users", userId);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            newUserNames[userId] = userData.displayName;
-            newUserPhotos[userId] =
-              userData.profilePictureUrl || "/default-user.jpg";
-          } else {
-            newUserNames[userId] = "Unknown";
-          }
-        }
-      });
-
-      await Promise.all(userFetchPromises);
-      setUserNames(newUserNames);
-      setUserPhotos(newUserPhotos);
-    };
-
-    if (comments.length > 0) {
-      fetchUserNames();
-    }
-  }, [comments, userNames, userPhotos]);
+  }, [id, fetchUsernamesAndPhotos]); // Now fetchUsernamesAndPhotos is stable
 
   // Handle Comment Submission
   const handleCommentSubmit = async (e) => {
@@ -75,19 +69,30 @@ export const CommentBox = ({ post, user, onClose }) => {
     if (!comment.trim()) return;
 
     const commentRef = collection(db, "posts", id, "comments");
-    await setDoc(doc(commentRef), {
-      userId: user.uid,
-      comment: comment.trim(),
-      timestamp: new Date(),
-    });
-    sendNotification(
-      user.uid,
-      id,
-      authorId,
-      "comment",
-      "commented on your post"
-    );
-    setComment(""); // Reset the input
+
+    try {
+      await setDoc(doc(commentRef), {
+        userId: user.uid,
+        comment: comment.trim(),
+        timestamp: new Date(),
+      });
+
+      await sendNotification(
+        user.uid,
+        id,
+        authorId,
+        "comment",
+        "commented on your post"
+      );
+
+      setComment("");
+    } catch (error) {
+      console.error("Error submitting comment: ", error);
+    }
+  };
+
+  const handleModalClick = (e) => {
+    e.stopPropagation(); // Prevent clicks inside the modal from closing it
   };
 
   return (
@@ -99,7 +104,7 @@ export const CommentBox = ({ post, user, onClose }) => {
     >
       <div
         ref={modalRef}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleModalClick}
         className="bg-white w-full h-full md:h-[80%] md:max-w-[60%] md:flex md:flex-row rounded-lg relative"
       >
         {/* Post Section for larger screens */}
@@ -146,9 +151,12 @@ export const CommentBox = ({ post, user, onClose }) => {
           <div className="mt-4 space-y-4">
             {comments.length > 0 ? (
               comments.map((comment, index) => (
-                <div key={index} className="flex mb-2 space-x-2 items-start">
+                <div
+                  key={comment.userId + index}
+                  className="flex mb-2 space-x-2 items-start"
+                >
                   <Image
-                    className="rounded-full"
+                    className="rounded-[50%] w-10 h-10"
                     src={userPhotos[comment.userId] || "/default-user.jpg"}
                     alt="Profile"
                     width={30}
@@ -187,7 +195,7 @@ export const CommentBox = ({ post, user, onClose }) => {
             comments.map((comment, index) => (
               <div key={index} className="flex space-x-2 mb-2 items-start">
                 <Image
-                  className="rounded-full"
+                  className="rounded-full w-10 h-10"
                   src={userPhotos[comment.userId] || "/default-user.jpg"}
                   alt="Profile"
                   width={30}
