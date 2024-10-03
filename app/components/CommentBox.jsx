@@ -11,6 +11,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineClose, AiOutlineSend } from "react-icons/ai";
 import Image from "next/image";
 import VideoPlayer from "./VideoPlayer";
+import sendNotification from "../utils/sendNotification";
 
 export const CommentBox = ({ post, user, onClose }) => {
   const { id, mediaUrl, mediaType, content, authorId } = post;
@@ -79,7 +80,13 @@ export const CommentBox = ({ post, user, onClose }) => {
       comment: comment.trim(),
       timestamp: new Date(),
     });
-
+    sendNotification(
+      user.uid,
+      id,
+      authorId,
+      "comment",
+      "commented on your post"
+    );
     setComment(""); // Reset the input
   };
 
