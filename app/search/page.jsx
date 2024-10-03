@@ -44,7 +44,7 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="p-4 mt-10 md:ml-[20%]">
+    <div className="p-4 md:p-10 mt-10 md:ml-[20%]">
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="mb-6 flex">
         <input
