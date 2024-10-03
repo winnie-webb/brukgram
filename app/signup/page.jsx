@@ -77,12 +77,12 @@ const Signup = () => {
     <div className="min-h-screen flex justify-center items-center bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-md">
         {error && <p className="text-red-500 text-center">{error}</p>}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6 text-black"
+        >
           <div>
-            <label
-              htmlFor="displayName"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="displayName" className="block text-sm font-medium ">
               Display Name
             </label>
             <input
@@ -98,10 +98,7 @@ const Signup = () => {
             )}
           </div>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium ">
               Email
             </label>
             <input
@@ -117,10 +114,7 @@ const Signup = () => {
             )}
           </div>
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium ">
               Password
             </label>
             <input
@@ -137,8 +131,8 @@ const Signup = () => {
           </div>
           <div>
             <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              htmlFor="password-check"
+              className="block text-sm font-medium "
             >
               Confirm password
             </label>
@@ -146,8 +140,9 @@ const Signup = () => {
               type="password"
               id="password-check"
               value={passwordChecker}
-              {...register("confirmPassword")}
-              onChange={(e) => setPasswordChecker(e.target.value)}
+              {...register("confirmPassword", {
+                onBlur: (e) => setPasswordChecker(e.target.value),
+              })} // Add onBlur handler
               className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.confirmPassword && (
