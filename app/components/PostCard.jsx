@@ -16,6 +16,7 @@ import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { CommentBox } from "./CommentBox";
 import { FiMessageCircle, FiSend } from "react-icons/fi";
 import Link from "next/link";
+import sendNotification from "../utils/sendNotification";
 
 const PostCard = ({ post }) => {
   const { id, mediaUrl, mediaType, content, authorId } = post;
@@ -69,6 +70,7 @@ const PostCard = ({ post }) => {
       await setDoc(likeRef, {
         userId: user.uid,
       });
+      sendNotification(user.uid, id, authorId, "like", "liked your post");
     }
   };
 
