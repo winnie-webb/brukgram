@@ -129,11 +129,11 @@ function Short({ short, lastVideoRef }) {
                 className="w-10 h-10 rounded-full"
                 width={40}
                 height={40}
-                src={author ? author.profilePictureUrl : "/default-user.jpg"}
+                src={author.profilePictureUrl || "/default-user.jpg"}
                 alt={short.content}
               />
-              <FollowButton targetUserId={short.authorId}></FollowButton>
               <span className="font-bold">{author.displayName}</span>
+              <FollowButton targetUserId={short.authorId}></FollowButton>
             </div>
             <p>{short.content}</p>
           </div>
