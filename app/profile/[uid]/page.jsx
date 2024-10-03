@@ -24,7 +24,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       // Fetch user data from Firestore
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", currentUserProfileId);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         setUserProfile(userSnap.data());
@@ -34,7 +34,7 @@ const ProfilePage = () => {
     };
 
     fetchUserProfile();
-  }, [user]);
+  }, [currentUserProfileId]);
 
   useEffect(() => {
     const postsRef = collection(db, "posts");
