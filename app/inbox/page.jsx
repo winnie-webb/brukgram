@@ -196,7 +196,7 @@ const InboxPage = () => {
                         convo.otherUser.profilePicture || "/default-user.jpg"
                       } // Use the correct key
                       alt={`${convo.otherUser.displayName}'s profile picture`}
-                      className="rounded-full mr-2"
+                      className="rounded-full w-14 h-14 mr-2 object-cover"
                       width={30}
                       height={30}
                     />
