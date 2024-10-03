@@ -13,10 +13,16 @@ import {
   AiFillHeart,
   AiFillUser,
 } from "react-icons/ai";
-import { BiMoviePlay, BiSolidMovie, BiSolidMoviePlay } from "react-icons/bi";
+import {
+  BiMessage,
+  BiMoviePlay,
+  BiSolidMovie,
+  BiSolidMoviePlay,
+} from "react-icons/bi";
 
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
+import { FiMessageCircle } from "react-icons/fi";
 
 const TabNav = ({ children }) => {
   const pathname = usePathname();
@@ -154,19 +160,6 @@ const TabNav = ({ children }) => {
             ></Image>
             <div className="flex gap-3">
               <button
-                onClick={() => handleNavigation("/posts")}
-                aria-label="Posts"
-                className={`flex flex-col items-center ${
-                  isActive("/posts") ? "text-black font-bold" : "text-black"
-                }`}
-              >
-                {isActive("/posts") ? (
-                  <AiFillPlusCircle className="text-3xl" />
-                ) : (
-                  <AiOutlinePlusCircle className="text-3xl" />
-                )}
-              </button>
-              <button
                 onClick={() => handleNavigation("/notifications")}
                 aria-label="Notifications"
                 className={`flex flex-col items-center ${
@@ -180,6 +173,15 @@ const TabNav = ({ children }) => {
                 ) : (
                   <AiOutlineHeart className="text-3xl" />
                 )}
+              </button>
+              <button
+                onClick={() => handleNavigation("/inbox")}
+                aria-label="Inbox"
+                className={`flex flex-col items-center ${
+                  isActive("/inbox") ? "text-black font-bold" : "text-black"
+                }`}
+              >
+                {<FiMessageCircle className="text-3xl" />}
               </button>
             </div>
           </div>
@@ -209,6 +211,19 @@ const TabNav = ({ children }) => {
                 <AiFillSearch className="text-3xl" />
               ) : (
                 <AiOutlineSearch className="text-3xl" />
+              )}
+            </button>
+            <button
+              onClick={() => handleNavigation("/posts")}
+              aria-label="Posts"
+              className={`flex flex-col items-center ${
+                isActive("/posts") ? "text-black font-bold" : "text-black"
+              }`}
+            >
+              {isActive("/posts") ? (
+                <AiFillPlusCircle className="text-3xl" />
+              ) : (
+                <AiOutlinePlusCircle className="text-3xl" />
               )}
             </button>
             <button
