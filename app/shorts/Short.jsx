@@ -10,7 +10,13 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import Image from "next/image";
-import { IoChatbubbleOutline, IoHeartOutline, IoHeart } from "react-icons/io5";
+import {
+  IoChatbubbleOutline,
+  IoHeartOutline,
+  IoHeart,
+  IoVolumeMute,
+  IoVolumeHigh,
+} from "react-icons/io5";
 import FollowButton from "../components/FollowBtn";
 import { CommentBox } from "../components/CommentBox";
 import { useAuth } from "../context/AuthContext";
@@ -18,6 +24,7 @@ import sendNotification from "../utils/sendNotification";
 
 function Short({ short, lastVideoRef }) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Start with video muted
   const { user } = useAuth();
   const videoRef = useRef(null);
   const [author, setAuthor] = useState(null);
@@ -80,18 +87,42 @@ function Short({ short, lastVideoRef }) {
   }, [short.id, user]);
 
   // Observer to detect if video is in view and handle autoplay and mute/unmute
+  // Observer to detect if video is in view and handle autoplay and mute/unmute
+  useEffect(() => {
+    const videoElement = videoRef.current; // Store the video element in a variable
 
-  const togglePlayPause = () => {
-    const video = videoRef.current;
-    if (video) {
-      if (isPlaying) {
-        video.pause();
-        video.muted = true;
-      } else {
-        video.play();
-        video.muted = false; // Unmute when playing
+    if (!videoElement) return; // Early return if video element doesn't exist yet
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          console.log("Intersection detected");
+          videoElement.play();
+          videoElement.muted = isMuted; // Mute by default when playing
+          setIsPlaying(true);
+        } else {
+          videoElement.pause();
+          setIsPlaying(false);
+        }
+      },
+      { threshold: 0.5 } // Video must be at least 50% in view to play
+    );
+
+    observer.observe(videoElement); // Observe the video element
+
+    return () => {
+      // Cleanup: Unobserve the video element on component unmount or when ref changes
+      if (videoElement) {
+        observer.unobserve(videoElement);
       }
-      setIsPlaying(!isPlaying);
+    };
+  }, [isMuted]);
+
+  // Handle mute/unmute when the video is clicked
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
     }
   };
 
@@ -127,11 +158,15 @@ function Short({ short, lastVideoRef }) {
             ref={videoRef}
             className="w-full h-full object-cover"
             src={short.mediaUrl}
-            onClick={togglePlayPause}
+            // onLoadedData={()=>setTimeout(()=>toggleMute())}
             loop
+            playsInline
+            autoPlay
+            muted={isMuted} // Ensure it's muted on start for autoplay
+            onClick={toggleMute} // Toggle mute/unmute on video click
           />
 
-          <div className="absolute bottom-8 left-4 text-white z-10">
+          <div className="absolute bottom-10 left-4 text-white z-10">
             <div className="flex items-center space-x-2 mb-2">
               <Image
                 className="w-10 h-10 rounded-full"
@@ -147,7 +182,7 @@ function Short({ short, lastVideoRef }) {
           </div>
 
           {comments && (
-            <div className="absolute bottom-8 right-4 flex flex-col space-y-4 z-10">
+            <div className="absolute bottom-10 right-4 flex flex-col space-y-4 z-10">
               <button
                 onClick={handleLike}
                 className="flex flex-col items-center"
@@ -174,6 +209,13 @@ function Short({ short, lastVideoRef }) {
                   onClose={() => setShowCommentBox(false)}
                 ></CommentBox>
               )}
+              <div className=" text-white cursor-pointer" onClick={toggleMute}>
+                {isMuted ? (
+                  <IoVolumeMute size={28} />
+                ) : (
+                  <IoVolumeHigh size={28} />
+                )}
+              </div>
             </div>
           )}
         </div>
