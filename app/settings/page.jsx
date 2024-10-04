@@ -126,7 +126,7 @@ const SettingsPage = () => {
           </label>
           <div className="mb-2">
             <Image
-              src={profilePictureUrl} // Show current or default profile picture
+              src={profilePictureUrl}
               alt="Profile"
               width={128}
               height={128}
@@ -162,13 +162,12 @@ const SettingsPage = () => {
           </label>
           <textarea
             id="bio"
-            value={bio} // Initialize with current bio
+            value={bio}
             onChange={(e) => setBio(e.target.value)}
             className="w-full p-2 border"
           />
         </div>
 
-        {/* Update Profile Button */}
         <button
           onClick={handleUpdateProfile}
           className="bg-indigo-600 md:w-48 text-white p-2 rounded"
@@ -179,7 +178,6 @@ const SettingsPage = () => {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        {/* Email Verification */}
         {!user.emailVerified && (
           <button
             onClick={(e) => handleEmailVerification(e)}
