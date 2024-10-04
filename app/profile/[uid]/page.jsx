@@ -1,3 +1,4 @@
+// app/profile/[uid]/ProfilePage.jsx
 "use client";
 import FollowButton from "@/app/components/FollowBtn";
 import VideoPlayer from "@/app/components/VideoPlayer";
@@ -19,11 +20,10 @@ const ProfilePage = () => {
 
   useEffect(() => {
     setIsSameUser(user.uid === currentUserProfileId);
-  }, [isSameUser, setIsSameUser, currentUserProfileId, user.uid]);
+  }, [currentUserProfileId, user.uid]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      // Fetch user data from Firestore
       const userRef = doc(db, "users", currentUserProfileId);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
@@ -41,13 +41,13 @@ const ProfilePage = () => {
     const unsubscribe = onSnapshot(postsRef, (snapshot) => {
       const postsData = snapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((post) => post.authorId === user.uid); // Filter posts by userId
+        .filter((post) => post.authorId === currentUserProfileId); // Filter posts by userId
 
       setUserPosts(postsData);
     });
 
     return () => unsubscribe();
-  }, [user.uid]);
+  }, [currentUserProfileId]);
 
   return (
     <div className="py-2 mt-14 md:mt-0 md:w-60% md:ml-[20%] md:p-10">
@@ -60,24 +60,21 @@ const ProfilePage = () => {
             width={128}
             height={128}
           />
-
           <div>
             <div className="flex gap-x-2">
               <h1 className="text-2xl font-bold">{userProfile.displayName}</h1>
-
-              <FollowButton targetUserId={currentUserProfileId}></FollowButton>
+              <FollowButton targetUserId={currentUserProfileId} />
             </div>
             {isSameUser && (
               <div className="md:absolute top-10 right-0">
                 <Link
                   href="/settings"
-                  className=" rounded-lg text-indigo-700 font-bold"
+                  className="rounded-lg text-indigo-700 font-bold"
                 >
                   Edit Profile
                 </Link>
               </div>
             )}
-
             <p className="text-gray-600">
               {userProfile.bio || "No bio available."}
             </p>
@@ -103,23 +100,24 @@ const ProfilePage = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.1rem] h-[100vh]">
           {userPosts.length > 0 ? (
-            userPosts.map((post) =>
-              post.mediaType === "image" ? (
-                <div key={post.id} className="relative h-full">
+            userPosts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/posts/${post.id}`}
+                className="relative h-full"
+              >
+                {post.mediaType === "image" ? (
                   <Image
                     src={post.mediaUrl}
                     alt="Post"
                     className="object-cover"
                     fill
                   />
-                </div>
-              ) : (
-                <VideoPlayer
-                  key={post.id}
-                  videoSrc={post.mediaUrl}
-                ></VideoPlayer>
-              )
-            )
+                ) : (
+                  <VideoPlayer videoSrc={post.mediaUrl} />
+                )}
+              </Link>
+            ))
           ) : (
             <p>No posts available.</p>
           )}
