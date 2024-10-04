@@ -90,8 +90,8 @@ const FollowButton = ({ targetUserId }) => {
     <button
       onClick={handleFollow}
       disabled={loading}
-      className={`px-4 py-2 rounded-md ${
-        isFollowing ? "bg-gray-300 text-black" : "bg-blue-500 text-white"
+      className={`px-2 py-[0.05rem] rounded-sm ${
+        isFollowing ? "bg-gray-300 text-black" : "bg-indigo-500 text-white"
       }`}
     >
       {isFollowing ? "Following" : "Follow"}
