@@ -15,7 +15,23 @@ const Signup = () => {
   const { currentUser, loading } = useAuth();
   const [error, setError] = useState(null);
   const router = useRouter();
-
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then((registration) => {
+            console.log(
+              "Service Worker registered with scope:",
+              registration.scope
+            );
+          })
+          .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+          });
+      });
+    }
+  }, []);
   // Check if display name already exists
   const checkDisplayNameExists = async (displayName) => {
     const displayNameRef = collection(db, "users");
