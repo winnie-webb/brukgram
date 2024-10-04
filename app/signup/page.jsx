@@ -12,14 +12,11 @@ import { registerUser } from "../components/auth-utils/registerUser";
 import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
   const { currentUser, loading } = useAuth();
   const [error, setError] = useState(null);
-
   const router = useRouter();
 
+  // Check if display name already exists
   const checkDisplayNameExists = async (displayName) => {
     const displayNameRef = collection(db, "users");
     const querySnapshot = await getDocs(displayNameRef);
@@ -29,12 +26,14 @@ const Signup = () => {
     return existingNames.includes(displayName);
   };
 
+  // Redirect if logged in
   useEffect(() => {
     if (!loading && currentUser) {
-      router.push("/"); // Redirect if logged in
+      router.push("/");
     }
   }, [currentUser, loading, router]);
 
+  // Validation schema using Yup
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
     password: Yup.string()
@@ -43,6 +42,15 @@ const Signup = () => {
     displayName: Yup.string().required("Display name is required"),
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
+  // Form submit handler
   const onSubmit = async (data) => {
     const { email, password, displayName } = data;
     try {
@@ -61,14 +69,6 @@ const Signup = () => {
     }
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-  });
-
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-lg rounded-md">
@@ -84,9 +84,8 @@ const Signup = () => {
             <input
               type="text"
               id="displayName"
-              value={displayName}
               {...register("displayName")}
-              onChange={(e) => setDisplayName(e.target.value)}
+              autoComplete="off" // Prevent autofill
               className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.displayName && (
@@ -100,9 +99,8 @@ const Signup = () => {
             <input
               type="email"
               id="email"
-              value={email}
               {...register("email")}
-              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="off" // Prevent autofill
               className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.email && (
@@ -116,9 +114,8 @@ const Signup = () => {
             <input
               type="password"
               id="password"
-              value={password}
               {...register("password")}
-              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="off" // Prevent autofill
               className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
             {errors.password && (
@@ -134,7 +131,6 @@ const Signup = () => {
           </button>
         </form>
         <GoogleBtn setError={setError} />
-
         <p className="text-center text-gray-600">
           Already have an account?{" "}
           <a href="/login" className="text-indigo-600 hover:text-indigo-500">
