@@ -98,7 +98,7 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.1rem] h-[100vh]">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.1rem]">
           {userPosts.length > 0 ? (
             userPosts.map((post) => (
               <Link
