@@ -1,9 +1,9 @@
-"use client"; // Client-side component
+"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { auth } from "../../firebase"; // Import the googleProvider
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import GoogleBtn from "../components/auth-utils/GoogleBtn";
 import { useAuth } from "../context/AuthContext"; // Use Auth context
@@ -16,11 +16,14 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
   const { user, loading } = useAuth(); // Access user and loading from context
+  const searchParams = useSearchParams(); // Get search params from URL
+  const recruiterQuery = searchParams.get("recruiter");
   useEffect(() => {
     if (!loading && user) {
       router.push("/"); // Redirect if logged in
     }
   }, [user, loading, router]);
+
   // Validation schema
   const validationSchema = Yup.object().shape({
     email: Yup.string().required("Email is required").email("Email is invalid"),
@@ -31,26 +34,41 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue, // Allows us to programmatically set input values
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
-  // Handle email/password login
-  const handleLogin = async (data) => {
-    const { email, password } = data;
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/"); // Redirect to homepage after login
-    } catch (err) {
-      if (err.code === "auth/wrong-password") {
-        setError("Invalid password.");
-      } else if (err.code === "auth/user-not-found") {
-        setError("User not found.");
-      } else {
-        setError("An error occurred. Please try again.");
+  // Handle email/password login wrapped in useCallback to memoize the function
+  const handleLogin = useCallback(
+    async (data) => {
+      const { email, password } = data;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        router.push("/"); // Redirect to homepage after login
+      } catch (err) {
+        if (err.code === "auth/wrong-password") {
+          setError("Invalid password.");
+        } else if (err.code === "auth/user-not-found") {
+          setError("User not found.");
+        } else {
+          setError("An error occurred. Please try again.");
+        }
       }
+    },
+    [router] // Dependencies of handleLogin
+  );
+
+  // Auto-fill credentials if recruiter query is present
+  useEffect(() => {
+    if (recruiterQuery) {
+      // Pre-fill email and password for recruiters
+      setValue("email", "recruiter@brukgram.com");
+      setValue("password", "recruiting");
+      // Auto-submit the form after pre-filling
+      handleSubmit(handleLogin)();
     }
-  };
+  }, [recruiterQuery, setValue, handleSubmit, handleLogin]); // Added handleLogin as a dependency
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-50">
