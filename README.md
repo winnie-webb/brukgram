@@ -19,4 +19,4 @@ BrukGram is a social media web app inspired by Instagram. It allows users to cre
 ### Installation and Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/brukgram.git
+   git clone https://github.com/winnie-webb/brukgram.git
